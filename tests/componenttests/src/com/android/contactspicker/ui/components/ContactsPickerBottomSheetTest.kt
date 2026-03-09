@@ -38,7 +38,6 @@ import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeDown
 import androidx.compose.ui.test.swipeUp
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.height
 import androidx.compose.ui.unit.width
 import androidx.test.core.app.ApplicationProvider
@@ -48,6 +47,7 @@ import com.android.contactspicker.ContactsPreviewState
 import com.android.contactspicker.ContactsUiState
 import com.android.contactspicker.R
 import com.android.contactspicker.data.model.ContactsSelection
+import com.android.contactspicker.data.model.PickerUserState
 import com.android.contactspicker.data.model.contactsSelectionOf
 import com.android.contactspicker.data.model.emptyContactsSelection
 import com.android.contactspicker.testdata.ContactTestDataFactory
@@ -177,6 +177,7 @@ class ContactsPickerBottomSheetTest {
                                 requestedMimeTypes = emptyList(),
                             )
                         ),
+                    userState = PickerUserState.Loading,
                     snackbarEvents = flowOf(),
                     onToggleContactSelection = {},
                     onToggleEntrySelection = { _, _ -> },
@@ -187,6 +188,8 @@ class ContactsPickerBottomSheetTest {
                     onPreviewClicked = {},
                     onBackFromPreview = {},
                     onPrivacyBannerDismissRequest = {},
+                    onProfileClicked = {},
+                    onDismissProfileBlockedDialog = {},
                 )
             }
         }
@@ -225,6 +228,7 @@ class ContactsPickerBottomSheetTest {
                                 requestedMimeTypes = emptyList(),
                             )
                         ),
+                    userState = PickerUserState.Loading,
                     snackbarEvents = flowOf(),
                     onToggleContactSelection = {},
                     onToggleEntrySelection = { _, _ -> },
@@ -235,6 +239,8 @@ class ContactsPickerBottomSheetTest {
                     onPreviewClicked = {},
                     onBackFromPreview = {},
                     onPrivacyBannerDismissRequest = {},
+                    onProfileClicked = {},
+                    onDismissProfileBlockedDialog = {},
                 )
             }
         }
@@ -289,6 +295,7 @@ class ContactsPickerBottomSheetTest {
                                 showPrivacyBanner = false,
                             )
                         ),
+                    userState = PickerUserState.Loading,
                     snackbarEvents = flowOf(),
                     onToggleEntrySelection = { _, _ -> },
                     onToggleContactSelection = {},
@@ -299,6 +306,8 @@ class ContactsPickerBottomSheetTest {
                     onPreviewClicked = {},
                     onBackFromPreview = {},
                     onPrivacyBannerDismissRequest = {},
+                    onProfileClicked = {},
+                    onDismissProfileBlockedDialog = {},
                 )
             }
         }
@@ -340,6 +349,7 @@ class ContactsPickerBottomSheetTest {
                             showPrivacyBanner = false,
                         )
                     ),
+                userState = PickerUserState.Loading,
                 snackbarEvents = events,
                 onToggleContactSelection = {},
                 onToggleEntrySelection = { _, _ -> },
@@ -350,6 +360,8 @@ class ContactsPickerBottomSheetTest {
                 onPreviewClicked = {},
                 onBackFromPreview = {},
                 onPrivacyBannerDismissRequest = {},
+                onProfileClicked = {},
+                onDismissProfileBlockedDialog = {},
             )
         }
 
@@ -381,6 +393,7 @@ class ContactsPickerBottomSheetTest {
                                 isMultiSelectEnabled = false,
                             )
                         ),
+                    userState = PickerUserState.Loading,
                     snackbarEvents = flowOf(),
                     onToggleContactSelection = {},
                     onToggleEntrySelection = { _, _ -> },
@@ -391,6 +404,8 @@ class ContactsPickerBottomSheetTest {
                     onPreviewClicked = {},
                     onBackFromPreview = { onBackFromPreview = true },
                     onPrivacyBannerDismissRequest = {},
+                    onProfileClicked = {},
+                    onDismissProfileBlockedDialog = {},
                 )
             }
         }
@@ -421,6 +436,7 @@ class ContactsPickerBottomSheetTest {
                                 requestedMimeTypes = emptyList(),
                             )
                         ),
+                    userState = PickerUserState.Loading,
                     snackbarEvents = flowOf(),
                     onToggleContactSelection = {},
                     onToggleEntrySelection = { _, _ -> },
@@ -431,6 +447,8 @@ class ContactsPickerBottomSheetTest {
                     onPreviewClicked = {},
                     onBackFromPreview = { onBackFromPreview = true },
                     onPrivacyBannerDismissRequest = {},
+                    onProfileClicked = {},
+                    onDismissProfileBlockedDialog = {},
                 )
             }
         }
@@ -494,6 +512,7 @@ class ContactsPickerBottomSheetTest {
                                 requestedMimeTypes = emptyList(),
                             )
                         ),
+                    userState = PickerUserState.Loading,
                     snackbarEvents = flowOf(),
                     onToggleContactSelection = {},
                     onToggleEntrySelection = { _, _ -> },
@@ -504,6 +523,8 @@ class ContactsPickerBottomSheetTest {
                     onPreviewClicked = {},
                     onBackFromPreview = {},
                     onPrivacyBannerDismissRequest = {},
+                    onProfileClicked = {},
+                    onDismissProfileBlockedDialog = {},
                 )
             }
         }
@@ -540,6 +561,7 @@ class ContactsPickerBottomSheetTest {
                 ContactsPickerBottomSheet(
                     onDismissRequest = onDismissRequest,
                     uiState = mutableStateOf(uiState),
+                    userState = PickerUserState.Loading,
                     snackbarEvents = flowOf(),
                     onToggleContactSelection = {},
                     onToggleEntrySelection = { _, _ -> },
@@ -550,6 +572,8 @@ class ContactsPickerBottomSheetTest {
                     onPreviewClicked = {},
                     onBackFromPreview = {},
                     onPrivacyBannerDismissRequest = {},
+                    onProfileClicked = {},
+                    onDismissProfileBlockedDialog = {},
                 )
             }
         }

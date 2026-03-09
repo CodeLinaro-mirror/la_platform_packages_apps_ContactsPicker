@@ -20,6 +20,7 @@ import android.content.Context
 import android.content.flags.Flags
 import android.content.pm.ProviderInfo
 import android.database.MatrixCursor
+import android.os.UserHandle
 import android.platform.test.annotations.RequiresFlagsEnabled
 import android.platform.test.flag.junit.CheckFlagsRule
 import android.platform.test.flag.junit.DeviceFlagsValueProvider
@@ -55,9 +56,13 @@ class ContactsRepositorySearchTest {
     @Before
     fun setUp() {
         val providerInfo = ProviderInfo().apply { authority = ContactsContract.AUTHORITY }
-        fakeContentProvider.attachInfo(mockContext, providerInfo)
+        fakeContentProvider.attachInfo(context, providerInfo)
 
         mockContentResolver.addProvider(ContactsContract.AUTHORITY, fakeContentProvider)
+        mockContentResolver.addProvider(
+            "${UserHandle.myUserId()}@${ContactsContract.AUTHORITY}",
+            fakeContentProvider,
+        )
         whenever(mockContext.contentResolver).thenReturn(mockContentResolver)
         whenever(mockContext.resources).thenReturn(context.resources)
         repository = ContactsRepositoryImpl(mockContext)
@@ -80,7 +85,8 @@ class ContactsRepositorySearchTest {
         val filterUri = Email.CONTENT_FILTER_URI.buildUpon().appendPath(query).build()
         fakeContentProvider.setCursorForUri(filterUri, cursor)
 
-        val contacts = repository.searchContacts(query, ContactsQueryMode.EmailsOnly)
+        val contacts =
+            repository.searchContacts(query, ContactsQueryMode.EmailsOnly, UserHandle.myUserId())
 
         assertThat(contacts).hasSize(1)
         val contact = contacts.first() as com.android.contactspicker.data.model.EmailContact
@@ -110,7 +116,8 @@ class ContactsRepositorySearchTest {
         val filterUri = Phone.CONTENT_FILTER_URI.buildUpon().appendPath(query).build()
         fakeContentProvider.setCursorForUri(filterUri, cursor)
 
-        val contacts = repository.searchContacts(query, ContactsQueryMode.PhonesOnly)
+        val contacts =
+            repository.searchContacts(query, ContactsQueryMode.PhonesOnly, UserHandle.myUserId())
 
         assertThat(contacts).hasSize(1)
         val contact = contacts.first() as com.android.contactspicker.data.model.PhoneContact
@@ -140,7 +147,12 @@ class ContactsRepositorySearchTest {
             ContactsContract.Contacts.CONTENT_FILTER_URI.buildUpon().appendPath(query).build()
         fakeContentProvider.setCursorForUri(filterUri, cursor)
 
-        val contacts = repository.searchContacts(query, ContactsQueryMode.DisplayNamesOnly)
+        val contacts =
+            repository.searchContacts(
+                query,
+                ContactsQueryMode.DisplayNamesOnly,
+                UserHandle.myUserId(),
+            )
 
         assertThat(contacts).hasSize(1)
         val contact = contacts.first() as DisplayNameContact
@@ -151,13 +163,17 @@ class ContactsRepositorySearchTest {
 
     @Test
     fun searchContacts_emptyQuery_returnsEmptyList() = runTest {
-        val contacts = repository.searchContacts("", ContactsQueryMode.PhonesOnly)
+        val contacts =
+            repository.searchContacts("", ContactsQueryMode.PhonesOnly, UserHandle.myUserId())
+
         assertThat(contacts).isEmpty()
     }
 
     @Test
     fun searchContacts_whitespaceQuery_returnsEmptyList() = runTest {
-        val contacts = repository.searchContacts("   ", ContactsQueryMode.EmailsOnly)
+        val contacts =
+            repository.searchContacts("   ", ContactsQueryMode.EmailsOnly, UserHandle.myUserId())
+
         assertThat(contacts).isEmpty()
     }
 
@@ -168,7 +184,9 @@ class ContactsRepositorySearchTest {
         val filterUri = Phone.CONTENT_FILTER_URI.buildUpon().appendPath(query).build()
         fakeContentProvider.setCursorForUri(filterUri, cursor)
 
-        val contacts = repository.searchContacts(query, ContactsQueryMode.PhonesOnly)
+        val contacts =
+            repository.searchContacts(query, ContactsQueryMode.PhonesOnly, UserHandle.myUserId())
+
         assertThat(contacts).isEmpty()
     }
 }

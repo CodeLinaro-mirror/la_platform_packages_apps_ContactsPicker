@@ -23,6 +23,7 @@
     <string name="contacts_picker_chooser_activity_title" msgid="2187765291094588596">"Contacts Picker"</string>
     <string name="contacts_picker_chooser_activity_no_app_can_handle_action" msgid="5179706900892295633">"कुनै पनि एपले यो कारबाही गर्न सक्दैन।"</string>
     <string name="contacts_picker_top_bar_search_placeholder_hint" msgid="327380354282823462">"खोज्नुहोस्"</string>
+    <string name="contacts_picker_search_expanded_hint" msgid="5748895040745140240">"आफ्ना कन्ट्याक्टहरू खोज्नुहोस्"</string>
     <string name="contacts_picker_top_bar_search_icon_content_description" msgid="176636737534343950">"खोज्नुहोस्"</string>
     <string name="contacts_picker_top_bar_search_clear_text_content_description" msgid="5304568529121015922">"सर्च फिल्डमा हालिएको टेक्स्ट हटाउनुहोस्"</string>
     <string name="contacts_picker_top_bar_search_arrow_back_content_description" msgid="5352118000652542537">"सर्च फिल्ड बन्द गर्नुहोस्"</string>
@@ -32,7 +33,7 @@
     <string name="emoji_header_icon_content_description" msgid="2926727446702186759">"मुस्कान जनाउने आइकन"</string>
     <string name="profile_switcher_content_description" msgid="4180951376809274279">"प्रोफाइल बदल्नुहोस्"</string>
     <string name="privacy_info_content_description" msgid="1633879608858355544">"गोपनीयतासम्बन्धी जानकारी"</string>
-    <string name="fast_scroller_handle_content_description" msgid="5785781874804788816">"फास्ट स्क्रोलर ह्यान्डल"</string>
+    <string name="scrubber_handle_content_description" msgid="1435669253806161568">"फास्ट स्क्रोलर ह्यान्डल"</string>
     <string name="contact_avatar_profile_picture_content_description" msgid="4077599609642932184">"कन्ट्याक्टको प्रोफाइल फोटो"</string>
     <string name="contact_avatar_initial_content_description" msgid="8441303818086750337">"कन्ट्याक्टको नामको सुरुको अक्षर"</string>
     <string name="no_name_placeholder" msgid="491336212594465933">"(कुनै पनि नाम छैन)"</string>
@@ -59,4 +60,12 @@
     <string name="privacy_details_menu_label" msgid="497348969731766203">"तपाईंका कन्ट्याक्टको गोपनीयता"</string>
     <string name="no_contacts_title" msgid="9093698629001614808">"अहिलेसम्म कुनै पनि कन्ट्याक्ट छैन"</string>
     <string name="no_contacts_description" msgid="2146615362021064099">"तपाईंले आफ्नो डिभाइसमा बनाउने वा इम्पोर्ट गर्ने कन्ट्याक्टहरू यहाँ देखिने छन्"</string>
+    <string name="user_type_personal" msgid="45376141973820399">"व्यक्तिगत"</string>
+    <string name="user_type_unknown_label" msgid="7034460972310129198">"अज्ञात प्रयोगकर्ता"</string>
+    <string name="picker_profile_paused_title" msgid="4083321530415544679">"%s एपहरू पज गरिएका छन्"</string>
+    <string name="picker_profile_paused_msg" msgid="2824051504891136577">"%1$s कन्ट्याक्टहरू खोल्न %2$s एपहरू अन गर्नुहोस् अनि फेरि प्रयास गर्नुहोस्"</string>
+    <!-- no translation found for picker_profile_blocked_admin_title (120810913376185332) -->
+    <skip />
+    <!-- no translation found for picker_profile_blocked_admin_msg (3792456887042138155) -->
+    <skip />
 </resources>

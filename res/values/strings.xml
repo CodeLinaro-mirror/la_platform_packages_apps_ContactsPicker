@@ -49,9 +49,6 @@
     <!--Content description for the profile switcher icon button in the top bar. Tapping it
         expands the profile switcher. [CHAR LIMIT=NONE] -->
     <string name="profile_switcher_content_description">Switch profile</string>
-    <!--Content description for the privacy icon button in the top bar. Tapping it opens the privacy
-        information banner. [CHAR LIMIT=NONE] -->
-    <string name="privacy_info_content_description">Privacy information</string>
     <!--Content description for scrubber's handle, which lets the user scroll quickly through a list.
         [CHAR_LIMIT=NONE] -->
     <string name="scrubber_handle_content_description">Fast scroller handle</string>
@@ -119,6 +116,8 @@
     <!-- Label for the button in the selection bar that allows the user to preview their selected
         contacts. [CHAR LIMIT=20] -->
     <string name="selection_bottom_bar_preview_button_label">Preview</string>
+    <!-- Content description for the preview button in the selection bar. [CHAR LIMIT=NONE] -->
+    <string name="selection_bottom_bar_preview_button_content_description">Preview selected contacts</string>
     <!-- Label for the button in the selection bar that allows the user to go back from the preview
         page. [CHAR LIMIT=20] -->
     <string name="selection_bottom_bar_back_button_label">Back</string>
@@ -138,6 +137,8 @@
 
     <!-- Preview screen title at the top of the page. [CHAR LIMIT=20] -->
     <string name="preview_screen_title">Preview</string>
+    <!-- Content description for the preview screen. [CHAR LIMIT=NONE] -->
+    <string name="preview_screen_content_description">Preview of selected contacts</string>
 
     <!-- The default fallback name to use for the calling application. -->
     <string name="default_calling_app_name">This app</string>
@@ -149,4 +150,17 @@
     <string name="no_contacts_title">No contacts yet</string>
     <!-- Secondary text shown when there are no contacts to display. [CHAR LIMIT=100] -->
     <string name="no_contacts_description">The contacts that you create or import to your device will appear here</string>
+
+    <!-- Text shown when there are no search results to display. [CHAR LIMIT=40] -->
+    <string name="no_results_found">No results found</string>
+    <!-- Secondary text shown when there are no search results to display. [CHAR LIMIT=100] -->
+    <string name="no_results_found_description">Try searching with a different spelling</string>
+
+    <string name="user_type_personal" translation_description="Label for Personal Profile">Personal</string>
+    <string name="user_type_unknown_label" translation_description="Label for an unknown user profile">Unknown User</string>
+
+    <string name="picker_profile_paused_title" translation_description="Title of the error dialog in Contacts Picker when the user tries to switch to other profile content, but the other profile is off. [CHAR LIMIT=80]">%s apps are paused</string>
+    <string name="picker_profile_paused_msg" translation_description="The message of the error dialog in Contacts Picker when the user tries to switch to other profile content, but the other profile is off. [CHAR LIMIT=NONE]">To open %1$s contacts, turn on your %2$s apps then try again</string>
+    <string name="picker_profile_blocked_admin_title" translation_description="Title of the dialog shown when a profile is blocked by admin.">Access blocked by your IT admin</string>
+    <string name="picker_profile_blocked_admin_msg" translation_description="The message for error dialog in Contacts Picker when the admin of any user profile blocks cross user interaction for the intent.">Contact them if you have any questions</string>
 </resources>

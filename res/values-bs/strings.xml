@@ -23,6 +23,7 @@
     <string name="contacts_picker_chooser_activity_title" msgid="2187765291094588596">"Birač kontakata"</string>
     <string name="contacts_picker_chooser_activity_no_app_can_handle_action" msgid="5179706900892295633">"Nijedna aplikacija ne može obaviti ovu radnju."</string>
     <string name="contacts_picker_top_bar_search_placeholder_hint" msgid="327380354282823462">"Pretražite"</string>
+    <string name="contacts_picker_search_expanded_hint" msgid="5748895040745140240">"Pretražite kontakte"</string>
     <string name="contacts_picker_top_bar_search_icon_content_description" msgid="176636737534343950">"Pretraživanje"</string>
     <string name="contacts_picker_top_bar_search_clear_text_content_description" msgid="5304568529121015922">"Brisanje teksta za pretraživanje"</string>
     <string name="contacts_picker_top_bar_search_arrow_back_content_description" msgid="5352118000652542537">"Zatvaranje pretraživanja"</string>
@@ -32,7 +33,7 @@
     <string name="emoji_header_icon_content_description" msgid="2926727446702186759">"Ikona osmijeha"</string>
     <string name="profile_switcher_content_description" msgid="4180951376809274279">"Promjena profila"</string>
     <string name="privacy_info_content_description" msgid="1633879608858355544">"Informacije o privatnosti"</string>
-    <string name="fast_scroller_handle_content_description" msgid="5785781874804788816">"Ručica brze klizne trake"</string>
+    <string name="scrubber_handle_content_description" msgid="1435669253806161568">"Ručica brze klizne trake"</string>
     <string name="contact_avatar_profile_picture_content_description" msgid="4077599609642932184">"Slika profila kontakta"</string>
     <string name="contact_avatar_initial_content_description" msgid="8441303818086750337">"Inicijal kontakta"</string>
     <string name="no_name_placeholder" msgid="491336212594465933">"(Bez imena)"</string>
@@ -59,4 +60,12 @@
     <string name="privacy_details_menu_label" msgid="497348969731766203">"Privatnost kontakata"</string>
     <string name="no_contacts_title" msgid="9093698629001614808">"Još uvijek nema kontakata"</string>
     <string name="no_contacts_description" msgid="2146615362021064099">"Ovdje će se prikazivati kontakti koje kreirate ili uvezete na uređaj"</string>
+    <string name="user_type_personal" msgid="45376141973820399">"Lično"</string>
+    <string name="user_type_unknown_label" msgid="7034460972310129198">"Nepoznati korisnik"</string>
+    <string name="picker_profile_paused_title" msgid="4083321530415544679">"%s aplikacija je pauzirana"</string>
+    <string name="picker_profile_paused_msg" msgid="2824051504891136577">"Da otvorite kontakte profila %1$s, uključite aplikacije profila %2$s, a zatim pokušajte ponovo"</string>
+    <!-- no translation found for picker_profile_blocked_admin_title (120810913376185332) -->
+    <skip />
+    <!-- no translation found for picker_profile_blocked_admin_msg (3792456887042138155) -->
+    <skip />
 </resources>
