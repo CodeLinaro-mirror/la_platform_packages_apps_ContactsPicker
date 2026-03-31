@@ -28,11 +28,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.android.contactspicker.ContactsListState
-import com.android.contactspicker.R
 import com.android.contactspicker.data.model.Contact
+import com.android.contactspicker.data.model.SelectionSource
 import com.android.contactspicker.ui.pickerscreen.CONTACTS_PICKER_SCREEN_LOADING_INDICATOR_TEST_TAG
 import com.android.contactspicker.ui.pickerscreen.ContactsPickerBody
 
@@ -47,19 +46,18 @@ fun ContactsListContent(
     uiState: ContactsListState,
     onPrivacyBannerMoreDetails: () -> Unit,
     onPrivacyBannerDismissRequest: () -> Unit,
-    onToggleContactSelection: (Contact) -> Unit,
-    onToggleEntrySelection: (contactId: Long, entryId: Long) -> Unit,
+    onToggleContactSelection: (Contact, SelectionSource) -> Unit,
+    onToggleEntrySelection: (contactId: Long, entryId: Long, SelectionSource) -> Unit,
 ) {
     when (uiState) {
-        is ContactsListState.Loading -> {
+        is ContactsListState.Loading ->
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator(
                     modifier = Modifier.testTag(CONTACTS_PICKER_SCREEN_LOADING_INDICATOR_TEST_TAG)
                 )
             }
-        }
 
-        is ContactsListState.Error -> {
+        is ContactsListState.Error ->
             Box(
                 modifier = Modifier.fillMaxSize().padding(16.dp),
                 contentAlignment = Alignment.Center,
@@ -70,28 +68,25 @@ fun ContactsListContent(
                     color = MaterialTheme.colorScheme.error,
                 )
             }
-        }
 
-        is ContactsListState.Success -> {
-            if (uiState.availableContacts.isEmpty()) {
-                EmptyContactsScreen(
-                    title = stringResource(id = R.string.no_contacts_title),
-                    description = stringResource(id = R.string.no_contacts_description),
-                    icon = Icons.Outlined.Group,
-                )
-            } else {
-                ContactsPickerBody(
-                    contacts = uiState.availableContacts,
-                    callingAppName = uiState.callingAppName,
-                    showPrivacyBanner = uiState.showPrivacyBanner,
-                    selectedContacts = uiState.selectedContacts,
-                    isMultiSelectEnabled = uiState.isMultiSelectEnabled,
-                    onToggleContactSelection = onToggleContactSelection,
-                    onToggleEntrySelection = onToggleEntrySelection,
-                    onPrivacyBannerMoreDetails = onPrivacyBannerMoreDetails,
-                    onPrivacyBannerDismissRequest = onPrivacyBannerDismissRequest,
-                )
-            }
-        }
+        is ContactsListState.Success ->
+            ContactsPickerBody(
+                contacts = uiState.availableContacts,
+                callingAppName = uiState.callingAppName,
+                showPrivacyBanner = uiState.showPrivacyBanner,
+                selectedContacts = uiState.selectedContacts,
+                isMultiSelectEnabled = uiState.isMultiSelectEnabled,
+                onToggleContactSelection = onToggleContactSelection,
+                onToggleEntrySelection = onToggleEntrySelection,
+                onPrivacyBannerMoreDetails = onPrivacyBannerMoreDetails,
+                onPrivacyBannerDismissRequest = onPrivacyBannerDismissRequest,
+            )
+
+        is ContactsListState.NoResults ->
+            EmptyContactsScreen(
+                title = uiState.titleText,
+                description = uiState.descriptionText,
+                icon = Icons.Outlined.Group,
+            )
     }
 }

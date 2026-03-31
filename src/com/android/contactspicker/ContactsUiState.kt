@@ -47,6 +47,9 @@ sealed interface ContactsListState : ContactsUiState {
         val requestedMimeTypes: List<MimeType>,
     ) : ContactsListState
 
+    data class NoResults(val titleText: String, val descriptionText: String? = null) :
+        ContactsListState
+
     /**
      * The state representing an error that occurred while loading the main contacts list.
      *

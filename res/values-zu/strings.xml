@@ -32,7 +32,6 @@
     <string name="favorites_header_icon_content_description" msgid="7094941017377292492">"Isithonjana senkanyezi"</string>
     <string name="emoji_header_icon_content_description" msgid="2926727446702186759">"Isithonjana sokumomotheka"</string>
     <string name="profile_switcher_content_description" msgid="4180951376809274279">"Shintsha iphrofayela"</string>
-    <string name="privacy_info_content_description" msgid="1633879608858355544">"Imininingwane yobumfihlo"</string>
     <string name="scrubber_handle_content_description" msgid="1435669253806161568">"Isibambi se-scroller esisheshayo"</string>
     <string name="contact_avatar_profile_picture_content_description" msgid="4077599609642932184">"Isithombe sephrofayela yoxhumana naye"</string>
     <string name="contact_avatar_initial_content_description" msgid="8441303818086750337">"Izinhlamvu zokuqala zegama loxhumana naye"</string>
@@ -41,7 +40,8 @@
     <string name="contact_item_collapse_button_content_description" msgid="6742731080975214281">"Goqa"</string>
     <string name="contact_item_phone_icon_content_description" msgid="8117150273224121391">"Ifoni"</string>
     <string name="contact_item_email_icon_content_description" msgid="286900034009619231">"I-imeyili"</string>
-    <string name="contact_item_emails_count" msgid="3836424032662346956">"{count,plural, =1{I-imeyili engu-#}one{Ama-imeyili angu-#}other{Ama-imeyili angu-#}}"</string>
+    <!-- no translation found for contact_item_emails_count (2351800816629653553) -->
+    <skip />
     <string name="contact_item_phones_count" msgid="1433705901810867685">"{count,plural, =1{Inombolo yefoni engu-#}one{Izinombolo zefoni ezingu-#}other{Izinombolo zefoni ezingu-#}}"</string>
     <string name="contact_item_emails_selected_count" msgid="5996362003818614724">"{total_count,plural, =1{I-imeyili engu-{selected_count} kwangu-#}one{Ama-imeyili angu-{selected_count} kwangu-#}other{Ama-imeyili angu-{selected_count} kwangu-#}}"</string>
     <string name="contact_item_phones_selected_count" msgid="4762497214231618256">"{total_count,plural, =1{Inombolo yefoni engu-{selected_count} kwezingu-#}one{Izinombolo zefoni ezingu-{selected_count} kwezingu-#}other{Izinombolo zefoni ezingu-{selected_count} kwezingu-#}}"</string>
@@ -49,6 +49,7 @@
     <string name="contact_item_selected_content_description" msgid="2909197675609882501">"Okungu-%1$s kukhethiwe"</string>
     <string name="selection_bottom_bar_clear_button_content_description" msgid="7573236319352718670">"Sula okukhethiwe"</string>
     <string name="selection_bottom_bar_preview_button_label" msgid="2700542796344166696">"Umbukisokuqala"</string>
+    <string name="selection_bottom_bar_preview_button_content_description" msgid="3351966150932170916">"Buka kuqala oxhumana nabo abakhethiwe"</string>
     <string name="selection_bottom_bar_back_button_label" msgid="6447375742968584743">"Emuva"</string>
     <string name="selection_bottom_bar_done_button_label" msgid="6954303718344998674">"Kwenziwe"</string>
     <string name="privacy_banner_description" msgid="8397685763338639247">"I-%1$s izokwazi ukufinyelela kuphela ulwazi oluvela koxhumana nabo obakhethayo"</string>
@@ -56,17 +57,20 @@
     <string name="privacy_banner_dismiss" msgid="3453400533805574139">"Chitha"</string>
     <string name="title_top_bar_back_button_content_description" msgid="7162880372713819715">"Emuva"</string>
     <string name="preview_screen_title" msgid="2852036336424026274">"Umbukisokuqala"</string>
+    <string name="preview_screen_content_description" msgid="7475368414223967934">"Umbukisokuqala woxhumana nabo abakhethiwe"</string>
     <string name="default_calling_app_name" msgid="5345125341557406609">"Le app"</string>
     <string name="privacy_details_menu_label" msgid="497348969731766203">"Ubumfihlo boxhumana nabo"</string>
     <string name="no_contacts_title" msgid="9093698629001614808">"Abekho oxhumana nabo okwamanje"</string>
+    <string name="no_email_contacts_title" msgid="501276640394262467">"Akekho othintwayo onamakheli e-imeyili"</string>
+    <string name="no_phone_contacts_title" msgid="3446367223904876925">"Akekho othintwayo onezinombolo zefoni"</string>
+    <string name="no_custom_details_contacts_title" msgid="8492259954778971307">"Abekho oxhumana nabo abanemininingwane edingekayo"</string>
     <string name="no_contacts_description" msgid="2146615362021064099">"Oxhumana nabo obasungulayo noma obangenisa kudivayisi yakho bazovela lapha"</string>
+    <string name="no_results_found" msgid="8513853958245248109">"Akunamiphumela etholakele"</string>
+    <string name="no_results_found_description" msgid="3316948006890920245">"Zama ukusesha ngesipelingi esihlukile"</string>
     <string name="user_type_personal" msgid="45376141973820399">"Okomuntu siqu"</string>
-    <!-- no translation found for user_type_unknown_label (7034460972310129198) -->
-    <skip />
+    <string name="user_type_unknown_label" msgid="7034460972310129198">"Umsebenzisi Ongaziwa"</string>
     <string name="picker_profile_paused_title" msgid="4083321530415544679">"Ama-app e-%s amisiwe"</string>
     <string name="picker_profile_paused_msg" msgid="2824051504891136577">"Ukuze uvule oxhumana nabo abangu-%1$s, vula ama-app akho e-%2$s bese uzama futhi"</string>
-    <!-- no translation found for picker_profile_blocked_admin_title (120810913376185332) -->
-    <skip />
-    <!-- no translation found for picker_profile_blocked_admin_msg (3792456887042138155) -->
-    <skip />
+    <string name="picker_profile_blocked_admin_title" msgid="120810913376185332">"Ukufinyelela kuvinjwe umphathi wakho we-IT"</string>
+    <string name="picker_profile_blocked_admin_msg" msgid="3792456887042138155">"Xhumana nabo uma unanoma yimiphi imibuzo"</string>
 </resources>

@@ -32,7 +32,6 @@
     <string name="favorites_header_icon_content_description" msgid="7094941017377292492">"Icon na star"</string>
     <string name="emoji_header_icon_content_description" msgid="2926727446702186759">"Icon ng ngiti"</string>
     <string name="profile_switcher_content_description" msgid="4180951376809274279">"Lumipat ng profile"</string>
-    <string name="privacy_info_content_description" msgid="1633879608858355544">"Impormasyon ng privacy"</string>
     <string name="scrubber_handle_content_description" msgid="1435669253806161568">"Handle ng mabilis na scroller"</string>
     <string name="contact_avatar_profile_picture_content_description" msgid="4077599609642932184">"Larawan sa profile ng contact"</string>
     <string name="contact_avatar_initial_content_description" msgid="8441303818086750337">"Inisyal ng contact"</string>
@@ -41,7 +40,7 @@
     <string name="contact_item_collapse_button_content_description" msgid="6742731080975214281">"I-collapse"</string>
     <string name="contact_item_phone_icon_content_description" msgid="8117150273224121391">"Telepono"</string>
     <string name="contact_item_email_icon_content_description" msgid="286900034009619231">"Email"</string>
-    <string name="contact_item_emails_count" msgid="3836424032662346956">"{count,plural, =1{# email}one{# email}other{# na email}}"</string>
+    <string name="contact_item_emails_count" msgid="2351800816629653553">"{count,plural, =1{# email address}one{# email address}other{# na email address}}"</string>
     <string name="contact_item_phones_count" msgid="1433705901810867685">"{count,plural, =1{# numero ng telepono}one{# numero ng telepono}other{# na numero ng telepono}}"</string>
     <string name="contact_item_emails_selected_count" msgid="5996362003818614724">"{total_count,plural, =1{{selected_count} sa # email}one{{selected_count} sa # email}other{{selected_count} sa # na email}}"</string>
     <string name="contact_item_phones_selected_count" msgid="4762497214231618256">"{total_count,plural, =1{{selected_count} sa # numero ng telepono}one{{selected_count} sa # numero ng telepono}other{{selected_count} sa # na numero ng telepono}}"</string>
@@ -49,6 +48,7 @@
     <string name="contact_item_selected_content_description" msgid="2909197675609882501">"%1$s ang napili"</string>
     <string name="selection_bottom_bar_clear_button_content_description" msgid="7573236319352718670">"I-clear ang pagpipilian"</string>
     <string name="selection_bottom_bar_preview_button_label" msgid="2700542796344166696">"I-preview"</string>
+    <string name="selection_bottom_bar_preview_button_content_description" msgid="3351966150932170916">"I-preview ang mga napiling contact"</string>
     <string name="selection_bottom_bar_back_button_label" msgid="6447375742968584743">"Bumalik"</string>
     <string name="selection_bottom_bar_done_button_label" msgid="6954303718344998674">"Tapos na"</string>
     <string name="privacy_banner_description" msgid="8397685763338639247">"Magkakaroon lang ng access ang %1$s sa impormasyon mula sa mga contact na pipiliin mo"</string>
@@ -56,16 +56,20 @@
     <string name="privacy_banner_dismiss" msgid="3453400533805574139">"I-dismiss"</string>
     <string name="title_top_bar_back_button_content_description" msgid="7162880372713819715">"Bumalik"</string>
     <string name="preview_screen_title" msgid="2852036336424026274">"I-preview"</string>
+    <string name="preview_screen_content_description" msgid="7475368414223967934">"Preview ng mga napiling contact"</string>
     <string name="default_calling_app_name" msgid="5345125341557406609">"App na ito"</string>
     <string name="privacy_details_menu_label" msgid="497348969731766203">"Privacy ng iyong mga contact"</string>
     <string name="no_contacts_title" msgid="9093698629001614808">"Wala pang contact"</string>
+    <string name="no_email_contacts_title" msgid="501276640394262467">"Walang contact na may mga email address"</string>
+    <string name="no_phone_contacts_title" msgid="3446367223904876925">"Walang contact na may numero ng telepono"</string>
+    <string name="no_custom_details_contacts_title" msgid="8492259954778971307">"Walang contact na may required info"</string>
     <string name="no_contacts_description" msgid="2146615362021064099">"Lalabas dito ang mga contact na gagawin o ii-import mo sa iyong device"</string>
+    <string name="no_results_found" msgid="8513853958245248109">"Walang nahanap na resulta"</string>
+    <string name="no_results_found_description" msgid="3316948006890920245">"Subukang maghanap gamit ang ibang spelling"</string>
     <string name="user_type_personal" msgid="45376141973820399">"Personal"</string>
     <string name="user_type_unknown_label" msgid="7034460972310129198">"Hindi Kilalang User"</string>
     <string name="picker_profile_paused_title" msgid="4083321530415544679">"Naka-pause ang mga %s app"</string>
     <string name="picker_profile_paused_msg" msgid="2824051504891136577">"Para buksan ang mga contact sa %1$s, i-on ang iyong mga %2$s app, pagkatapos ay subukan ulit"</string>
-    <!-- no translation found for picker_profile_blocked_admin_title (120810913376185332) -->
-    <skip />
-    <!-- no translation found for picker_profile_blocked_admin_msg (3792456887042138155) -->
-    <skip />
+    <string name="picker_profile_blocked_admin_title" msgid="120810913376185332">"Na-block ng iyong IT admin ang access"</string>
+    <string name="picker_profile_blocked_admin_msg" msgid="3792456887042138155">"Makipag-ugnayan sa kanya kung mayroon kang anumang tanong"</string>
 </resources>

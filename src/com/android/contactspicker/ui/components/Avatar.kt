@@ -21,6 +21,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,6 +34,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.hideFromAccessibility
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -39,7 +43,8 @@ import com.android.contactspicker.R
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 
-const val AVATAR_TEST_TAG = "contact_avatar"
+internal const val AVATAR_TEST_TAG = "contact_avatar"
+internal const val AVATAR_FALLBACK_PERSON_ICON_TEST_TAG = "avatar_fallback_person_icon"
 
 /**
  * A composable that displays a circular avatar with the first initial of a display name.
@@ -54,7 +59,8 @@ fun Avatar(displayName: String, profilePictureUri: String?) {
         modifier =
             Modifier.size(40.dp)
                 .clip(CircleShape) // Clip the whole container
-                .testTag(AVATAR_TEST_TAG),
+                .testTag(AVATAR_TEST_TAG)
+                .semantics { hideFromAccessibility() },
         contentAlignment = Alignment.Center,
     ) {
         if (!profilePictureUri.isNullOrBlank()) {
@@ -66,7 +72,7 @@ fun Avatar(displayName: String, profilePictureUri: String?) {
                 contentScale = ContentScale.Crop,
             )
         } else {
-            // Fallback to initials
+            // Fallback to initials / person icon
             val initialContentDescription =
                 stringResource(R.string.contact_avatar_initial_content_description)
             Box(
@@ -76,13 +82,23 @@ fun Avatar(displayName: String, profilePictureUri: String?) {
                         .semantics { contentDescription = initialContentDescription },
                 contentAlignment = Alignment.Center,
             ) {
-                val initial = displayName.firstOrNull()?.uppercase() ?: ""
-                Text(
-                    text = initial,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                    fontSize = 18.sp,
-                    textAlign = TextAlign.Center,
-                )
+                val firstChar = displayName.firstOrNull()
+                if (firstChar?.isLetter() == true) {
+                    Text(
+                        text = firstChar.uppercase(),
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                        fontSize = 18.sp,
+                        textAlign = TextAlign.Center,
+                    )
+                } else {
+                    Icon(
+                        imageVector = Icons.Filled.Person,
+                        contentDescription = null,
+                        modifier =
+                            Modifier.size(32.dp).testTag(AVATAR_FALLBACK_PERSON_ICON_TEST_TAG),
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                    )
+                }
             }
         }
     }

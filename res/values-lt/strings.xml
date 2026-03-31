@@ -32,7 +32,6 @@
     <string name="favorites_header_icon_content_description" msgid="7094941017377292492">"Žvaigždutės piktograma"</string>
     <string name="emoji_header_icon_content_description" msgid="2926727446702186759">"Besišypsančio veidelio piktograma"</string>
     <string name="profile_switcher_content_description" msgid="4180951376809274279">"Perjungti profilį"</string>
-    <string name="privacy_info_content_description" msgid="1633879608858355544">"Privatumo informacija"</string>
     <string name="scrubber_handle_content_description" msgid="1435669253806161568">"Sparčiojo slinkimo rankenėlė"</string>
     <string name="contact_avatar_profile_picture_content_description" msgid="4077599609642932184">"Kontakto profilio nuotrauka"</string>
     <string name="contact_avatar_initial_content_description" msgid="8441303818086750337">"Kontakto inicialas"</string>
@@ -41,7 +40,7 @@
     <string name="contact_item_collapse_button_content_description" msgid="6742731080975214281">"Sutraukti"</string>
     <string name="contact_item_phone_icon_content_description" msgid="8117150273224121391">"Telefonas"</string>
     <string name="contact_item_email_icon_content_description" msgid="286900034009619231">"El. paštas"</string>
-    <string name="contact_item_emails_count" msgid="3836424032662346956">"{count,plural, =1{# el. pašto adresas}one{# el. pašto adresas}few{# el. pašto adresai}many{# el. pašto adreso}other{# el. pašto adresų}}"</string>
+    <string name="contact_item_emails_count" msgid="2351800816629653553">"{count,plural, =1{# el. pašto adresas}one{# el. pašto adresas}few{# el. pašto adresai}many{# el. pašto adreso}other{# el. pašto adresų}}"</string>
     <string name="contact_item_phones_count" msgid="1433705901810867685">"{count,plural, =1{# telefono numeris}one{# telefono numeris}few{# telefono numeriai}many{# telefono numerio}other{# telefono numerių}}"</string>
     <string name="contact_item_emails_selected_count" msgid="5996362003818614724">"{total_count,plural, =1{{selected_count} iš # el. pašto adreso}one{{selected_count} iš # el. pašto adreso}few{{selected_count} iš # el. pašto adresų}many{{selected_count} iš # el. pašto adreso}other{{selected_count} iš # el. pašto adresų}}"</string>
     <string name="contact_item_phones_selected_count" msgid="4762497214231618256">"{total_count,plural, =1{{selected_count} iš # telefono numerio}one{{selected_count} iš # telefono numerio}few{{selected_count} iš # telefono numerių}many{{selected_count} iš # telefono numerio}other{{selected_count} iš # telefono numerių}}"</string>
@@ -49,6 +48,7 @@
     <string name="contact_item_selected_content_description" msgid="2909197675609882501">"Pasirinktų elementų: %1$s"</string>
     <string name="selection_bottom_bar_clear_button_content_description" msgid="7573236319352718670">"Išvalyti pasirinkimą"</string>
     <string name="selection_bottom_bar_preview_button_label" msgid="2700542796344166696">"Peržiūrėti"</string>
+    <string name="selection_bottom_bar_preview_button_content_description" msgid="3351966150932170916">"Peržiūrėti pasirinktus kontaktus"</string>
     <string name="selection_bottom_bar_back_button_label" msgid="6447375742968584743">"Atgal"</string>
     <string name="selection_bottom_bar_done_button_label" msgid="6954303718344998674">"Atlikta"</string>
     <string name="privacy_banner_description" msgid="8397685763338639247">"„%1$s“ galės pasiekti tik informaciją iš jūsų pasirinktų kontaktų"</string>
@@ -56,16 +56,20 @@
     <string name="privacy_banner_dismiss" msgid="3453400533805574139">"Uždaryti"</string>
     <string name="title_top_bar_back_button_content_description" msgid="7162880372713819715">"Atgal"</string>
     <string name="preview_screen_title" msgid="2852036336424026274">"Peržiūrėti"</string>
+    <string name="preview_screen_content_description" msgid="7475368414223967934">"Pasirinktų kontaktų peržiūra"</string>
     <string name="default_calling_app_name" msgid="5345125341557406609">"Ši programa"</string>
     <string name="privacy_details_menu_label" msgid="497348969731766203">"Jūsų kontaktų privatumas"</string>
     <string name="no_contacts_title" msgid="9093698629001614808">"Dar nėra jokių kontaktų"</string>
+    <string name="no_email_contacts_title" msgid="501276640394262467">"Nėra kontaktų su el. pašto adresais"</string>
+    <string name="no_phone_contacts_title" msgid="3446367223904876925">"Nėra kontaktų su telefono numeriais"</string>
+    <string name="no_custom_details_contacts_title" msgid="8492259954778971307">"Nėra kontaktų su būtina informacija"</string>
     <string name="no_contacts_description" msgid="2146615362021064099">"Čia bus rodomi kontaktai, kuriuos sukuriate arba importuojate į įrenginį"</string>
+    <string name="no_results_found" msgid="8513853958245248109">"Nerasta jokių rezultatų"</string>
+    <string name="no_results_found_description" msgid="3316948006890920245">"Bandykite ieškoti rašydami kitaip"</string>
     <string name="user_type_personal" msgid="45376141973820399">"Asmeninė"</string>
     <string name="user_type_unknown_label" msgid="7034460972310129198">"Nežinomas naudotojas"</string>
     <string name="picker_profile_paused_title" msgid="4083321530415544679">"Pristabdyta %s progr."</string>
     <string name="picker_profile_paused_msg" msgid="2824051504891136577">"Jei norite atidaryti %1$s kont., įjunkite %2$s progr. ir bandykite dar kartą"</string>
-    <!-- no translation found for picker_profile_blocked_admin_title (120810913376185332) -->
-    <skip />
-    <!-- no translation found for picker_profile_blocked_admin_msg (3792456887042138155) -->
-    <skip />
+    <string name="picker_profile_blocked_admin_title" msgid="120810913376185332">"Prieigą užblokavo jūsų IT administratorius"</string>
+    <string name="picker_profile_blocked_admin_msg" msgid="3792456887042138155">"Jei turite klausimų, susisiekite su juo"</string>
 </resources>

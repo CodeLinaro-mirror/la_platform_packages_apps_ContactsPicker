@@ -49,9 +49,6 @@
     <!--Content description for the profile switcher icon button in the top bar. Tapping it
         expands the profile switcher. [CHAR LIMIT=NONE] -->
     <string name="profile_switcher_content_description">Switch profile</string>
-    <!--Content description for the privacy icon button in the top bar. Tapping it opens the privacy
-        information banner. [CHAR LIMIT=NONE] -->
-    <string name="privacy_info_content_description">Privacy information</string>
     <!--Content description for scrubber's handle, which lets the user scroll quickly through a list.
         [CHAR_LIMIT=NONE] -->
     <string name="scrubber_handle_content_description">Fast scroller handle</string>
@@ -79,8 +76,8 @@
         [CHAR LIMIT=NONE] -->
     <string name="contact_item_emails_count">
         {count, plural,
-        =1 {# email}
-        other {# emails}}
+        =1 {# email address}
+        other {# email addresses}}
     </string>
     <!-- Count of phone numbers shown in the collapsed contact item with multiple numbers when none
         are selected. [CHAR LIMIT=NONE] -->
@@ -151,6 +148,12 @@
 
     <!-- Text shown when there are no contacts to display. [CHAR LIMIT=40] -->
     <string name="no_contacts_title">No contacts yet</string>
+    <!-- Text shown when there are no contacts to display. [CHAR LIMIT=40] -->
+    <string name="no_email_contacts_title">No contacts with email addresses</string>
+    <!-- Text shown when there are no contacts to display. [CHAR LIMIT=40] -->
+    <string name="no_phone_contacts_title">No contacts with phone numbers</string>
+    <!-- Text shown when there are no contacts to display. [CHAR LIMIT=40] -->
+    <string name="no_custom_details_contacts_title">No contacts with required info</string>
     <!-- Secondary text shown when there are no contacts to display. [CHAR LIMIT=100] -->
     <string name="no_contacts_description">The contacts that you create or import to your device will appear here</string>
 

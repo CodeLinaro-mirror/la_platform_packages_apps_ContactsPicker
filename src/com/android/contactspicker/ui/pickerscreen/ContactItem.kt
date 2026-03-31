@@ -38,7 +38,9 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.Phone
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.FilledIconToggleButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
@@ -56,8 +58,16 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.hideFromAccessibility
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.ParagraphStyle
+import androidx.compose.ui.text.VerbatimTtsAnnotation
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDirection
+import androidx.compose.ui.text.withAnnotation
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.android.contactspicker.R
 import com.android.contactspicker.data.model.Contact
@@ -79,6 +89,9 @@ private val ICON_TEXT_SPACING = 8.dp
 private val CARD_OUTER_CORNER_RADIUS = 32.dp
 private val CARD_INNER_CORNER_RADIUS = 4.dp
 
+internal val TOGGLE_ICON_BOX_SIZE = 48.dp
+internal val TOGGLE_ICON_BUTTON_HEIGHT = 40.dp
+internal val TOGGLE_ICON_BUTTON_WIDTH = 32.dp
 internal val TOP_ITEM_SHAPE =
     RoundedCornerShape(
         topStart = CARD_OUTER_CORNER_RADIUS,
@@ -131,7 +144,7 @@ fun ContactItem(
     isMultiSelectEnabled: Boolean,
     isSearchMode: Boolean,
     onToggleContactSelection: (Contact) -> Unit,
-    onToggleEntrySelection: (contactId: Long, entryId: Long) -> Unit,
+    onToggleEntrySelection: (Long, Long) -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
     val isExpandable =
@@ -160,7 +173,7 @@ fun ContactItem(
     val onAvatarClick: () -> Unit = {
         if (isSearchMode) {
             searchTargetEntryId?.let { entryId -> onToggleEntrySelection(contact.id, entryId) }
-        } else if (isMultiSelectEnabled || !isExpandable) {
+        } else if (isSelected || isMultiSelectEnabled || !isExpandable) {
             // In multi-select, or for simple contacts, the avatar toggles selection.
             onToggleContactSelection(contact)
         } else {
@@ -210,13 +223,10 @@ fun ContactItem(
                     )
                     // Secondary text changes based on the type, total count of contact entries, and
                     // count of selected entries.
-                    contact.secondaryText(selectedEntries ?: emptySet())?.let { secondaryText ->
-                        Text(
-                            text = secondaryText,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
+                    ContactSecondaryText(
+                        contact = contact,
+                        selectedEntries = selectedEntries ?: emptySet(),
+                    )
                 }
                 if (isExpandable && !isSearchMode) {
                     val rotationAngle by
@@ -224,16 +234,42 @@ fun ContactItem(
                             targetValue = if (expanded) 180f else 0f,
                             label = "expand_collapse_icon_rotation",
                         )
-                    Icon(
-                        imageVector = Icons.Default.KeyboardArrowDown,
-                        contentDescription =
-                            stringResource(
-                                if (expanded)
-                                    R.string.contact_item_collapse_button_content_description
-                                else R.string.contact_item_expand_button_content_description
-                            ),
-                        modifier = Modifier.graphicsLayer { rotationZ = rotationAngle },
-                    )
+
+                    Box(
+                        modifier = Modifier.size(TOGGLE_ICON_BOX_SIZE),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        FilledIconToggleButton(
+                            checked = expanded,
+                            onCheckedChange = { expanded = it },
+                            modifier =
+                                Modifier.size(
+                                    width = TOGGLE_ICON_BUTTON_WIDTH,
+                                    height = TOGGLE_ICON_BUTTON_HEIGHT,
+                                ),
+                            shape = CircleShape,
+                            colors =
+                                IconButtonDefaults.filledIconToggleButtonColors(
+                                    containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    checkedContainerColor =
+                                        MaterialTheme.colorScheme.surfaceContainer,
+                                    checkedContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                ),
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.KeyboardArrowDown,
+                                contentDescription =
+                                    stringResource(
+                                        if (expanded)
+                                            R.string
+                                                .contact_item_collapse_button_content_description
+                                        else R.string.contact_item_expand_button_content_description
+                                    ),
+                                modifier = Modifier.graphicsLayer { rotationZ = rotationAngle },
+                            )
+                        }
+                    }
                 }
             }
 
@@ -250,86 +286,117 @@ fun ContactItem(
 }
 
 /**
- * Determines the secondary text to display below the contact's name.
+ * Determines and displays the secondary text below the contact's name. Handles early return for
+ * contacts without entries and ensures correct [TextDirection] for raw data vs. localized strings.
  *
- * Returns:
- * - null if the contact has no entries (i.e., it's a [DisplayNameContact]).
+ * Displays:
+ * - nothing if the contact has no entries (i.e., it's a [DisplayNameContact]).
  * - the phone number or email for single entry contacts.
  * - for multi-entry contacts a formatted count string (e.g., "2 phone numbers") if none are
  *   selected, or a count of selected entries (e.g., "1 of 2 selected").
  */
 @Composable
-private fun Contact.secondaryText(selectedEntries: Set<Long>): String? {
+private fun ContactSecondaryText(
+    contact: Contact,
+    selectedEntries: Set<Long>,
+    modifier: Modifier = Modifier,
+) {
     val context = LocalContext.current
-    return when (this) {
-        is DisplayNameContact -> null
-        is EmailContact -> {
-            val totalCount = emails.size
-            val selectedCount = emails.count { selectedEntries.contains(it.id) }
-            if (totalCount > 1) {
+    val isVerbatim = contact is PhoneContact && contact.phones.size == 1
 
-                formatMultiEntrySecondaryText(
-                    selectedCount,
-                    totalCount,
-                    context.getString(R.string.contact_item_emails_selected_count),
-                    context.getString(R.string.contact_item_emails_count),
-                )
-            } else {
-                emails.first().address
+    val (text, direction) =
+        when (contact) {
+            is EmailContact -> {
+                val totalCount = contact.emails.size
+                if (totalCount > 1) {
+                    val selectedCount = contact.emails.count { selectedEntries.contains(it.id) }
+                    formatMultiEntrySecondaryText(
+                        selectedCount,
+                        totalCount,
+                        context.getString(R.string.contact_item_emails_selected_count),
+                        context.getString(R.string.contact_item_emails_count),
+                    ) to TextDirection.Content
+                } else {
+                    contact.emails.first().address to TextDirection.Ltr
+                }
             }
+            is PhoneContact -> {
+                val totalCount = contact.phones.size
+                if (totalCount > 1) {
+                    val selectedCount = contact.phones.count { selectedEntries.contains(it.id) }
+
+                    formatMultiEntrySecondaryText(
+                        selectedCount,
+                        totalCount,
+                        context.getString(R.string.contact_item_phones_selected_count),
+                        context.getString(R.string.contact_item_phones_count),
+                    ) to TextDirection.Content
+                } else {
+                    contact.phones.first().number to TextDirection.Ltr
+                }
+            }
+            else -> return
         }
 
-        is PhoneContact -> {
-            val totalCount = phones.size
-            val selectedCount = phones.count { selectedEntries.contains(it.id) }
-            if (totalCount > 1) {
-                formatMultiEntrySecondaryText(
-                    selectedCount,
-                    totalCount,
-                    context.getString(R.string.contact_item_phones_selected_count),
-                    context.getString(R.string.contact_item_phones_count),
-                )
-            } else {
-                phones.first().number
+    val annotatedString = rememberAnnotatedContactData(text, direction, isVerbatim)
+
+    Text(
+        text = annotatedString,
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = modifier,
+    )
+}
+
+/**
+ * Constructs and remembers an [AnnotatedString] for contact data, applying the [ParagraphStyle] for
+ * RTL directionality and [VerbatimTtsAnnotation] for TalkBack integrity.
+ */
+@Composable
+private fun rememberAnnotatedContactData(
+    text: String,
+    direction: TextDirection,
+    isVerbatim: Boolean,
+): AnnotatedString =
+    remember(text, direction, isVerbatim) {
+        buildAnnotatedString {
+            withStyle(ParagraphStyle(textDirection = direction)) {
+                if (isVerbatim) {
+                    withAnnotation(VerbatimTtsAnnotation(text)) { append(text) }
+                } else {
+                    append(text)
+                }
             }
         }
     }
-}
 
+/** Returns a plain formatted string for multi-entry counts. */
 fun formatMultiEntrySecondaryText(
     selectedCount: Int,
     totalCount: Int,
     itemsSelectedCountMessage: String,
     noItemsSelectedCountMessage: String,
-): String? {
+): String {
     val (msgFormat, args) =
-        if (selectedCount > 0) {
+        if (selectedCount > 0)
+            MessageFormat(itemsSelectedCountMessage, Locale.getDefault()) to
+                mapOf("selected_count" to selectedCount, "total_count" to totalCount)
+        else
+            MessageFormat(noItemsSelectedCountMessage, Locale.getDefault()) to
+                mapOf("count" to totalCount)
 
-            Pair(
-                MessageFormat(itemsSelectedCountMessage, Locale.getDefault()),
-                mapOf(Pair("selected_count", selectedCount), Pair("total_count", totalCount)),
-            )
-        } else {
-            Pair(
-                MessageFormat(noItemsSelectedCountMessage, Locale.getDefault()),
-                mapOf(Pair("count", totalCount)),
-            )
-        }
     return msgFormat.format(args)
 }
 
 @Composable
 private fun SelectableAvatar(contact: Contact, isSelected: Boolean, onClick: () -> Unit) {
     Box(
-        modifier = Modifier.size(40.dp).clickable(onClick = onClick),
+        modifier = Modifier.size(40.dp).clip(CircleShape).clickable(onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
         if (isSelected) {
             Box(
-                modifier =
-                    Modifier.fillMaxSize()
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.primary),
+                modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.primary),
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(
@@ -387,8 +454,14 @@ private fun ExpandedPhoneEntry(
     isMultiSelectEnabled: Boolean,
     onCheckedChange: () -> Unit,
 ) {
+    val annotatedText =
+        rememberAnnotatedContactData(
+            text = phoneEntry.number,
+            direction = TextDirection.Ltr,
+            isVerbatim = true,
+        )
     ExpandedContactEntry(
-        text = phoneEntry.number,
+        text = annotatedText,
         label = phoneEntry.label,
         isChecked = isChecked,
         isMultiSelectEnabled = isMultiSelectEnabled,
@@ -410,8 +483,14 @@ private fun ExpandedEmailEntry(
     isMultiSelectEnabled: Boolean,
     onCheckedChange: () -> Unit,
 ) {
+    val annotatedText =
+        rememberAnnotatedContactData(
+            text = emailEntry.address,
+            direction = TextDirection.Content,
+            isVerbatim = false,
+        )
     ExpandedContactEntry(
-        text = emailEntry.address,
+        text = annotatedText,
         label = emailEntry.label,
         isChecked = isChecked,
         isMultiSelectEnabled = isMultiSelectEnabled,
@@ -428,7 +507,7 @@ private fun ExpandedEmailEntry(
 
 @Composable
 private fun ExpandedContactEntry(
-    text: String,
+    text: AnnotatedString,
     label: String?,
     isChecked: Boolean,
     isMultiSelectEnabled: Boolean,
@@ -461,6 +540,8 @@ private fun ExpandedContactEntry(
             }
         }
         SelectionControl(
+            // The whole row is clickable so hide the selection control from Talkback.
+            modifier = Modifier.semantics { hideFromAccessibility() },
             selected = isChecked,
             isMultiSelect = isMultiSelectEnabled,
             onValueChange = { onCheckedChange() },
@@ -469,11 +550,18 @@ private fun ExpandedContactEntry(
 }
 
 @Composable
-private fun SelectionControl(selected: Boolean, isMultiSelect: Boolean, onValueChange: () -> Unit) {
-    if (isMultiSelect) {
-        Checkbox(checked = selected, onCheckedChange = { onValueChange() })
-    } else {
-        RadioButton(selected = selected, onClick = onValueChange)
+private fun SelectionControl(
+    selected: Boolean,
+    isMultiSelect: Boolean,
+    onValueChange: () -> Unit,
+    modifier: Modifier,
+) {
+    Box(modifier = Modifier.size(TOGGLE_ICON_BOX_SIZE), contentAlignment = Alignment.Center) {
+        if (isMultiSelect) {
+            Checkbox(modifier = modifier, checked = selected, onCheckedChange = { onValueChange() })
+        } else {
+            RadioButton(modifier = modifier, selected = selected, onClick = onValueChange)
+        }
     }
 }
 

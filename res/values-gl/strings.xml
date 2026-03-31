@@ -32,7 +32,6 @@
     <string name="favorites_header_icon_content_description" msgid="7094941017377292492">"Icona de estrela"</string>
     <string name="emoji_header_icon_content_description" msgid="2926727446702186759">"Icona de sorriso"</string>
     <string name="profile_switcher_content_description" msgid="4180951376809274279">"Cambiar de perfil"</string>
-    <string name="privacy_info_content_description" msgid="1633879608858355544">"Información acerca da privacidade"</string>
     <string name="scrubber_handle_content_description" msgid="1435669253806161568">"Controlador de desprazamento rápido"</string>
     <string name="contact_avatar_profile_picture_content_description" msgid="4077599609642932184">"Imaxe do perfil do contacto"</string>
     <string name="contact_avatar_initial_content_description" msgid="8441303818086750337">"Inicial do contacto"</string>
@@ -41,7 +40,7 @@
     <string name="contact_item_collapse_button_content_description" msgid="6742731080975214281">"Contraer"</string>
     <string name="contact_item_phone_icon_content_description" msgid="8117150273224121391">"Teléfono"</string>
     <string name="contact_item_email_icon_content_description" msgid="286900034009619231">"Correo electrónico"</string>
-    <string name="contact_item_emails_count" msgid="3836424032662346956">"{count,plural, =1{# correo electrónico}other{# correos electrónicos}}"</string>
+    <string name="contact_item_emails_count" msgid="2351800816629653553">"{count,plural, =1{# enderezo de correo electrónico}other{# enderezos de correo electrónico}}"</string>
     <string name="contact_item_phones_count" msgid="1433705901810867685">"{count,plural, =1{# número de teléfono}other{# números de teléfono}}"</string>
     <string name="contact_item_emails_selected_count" msgid="5996362003818614724">"{total_count,plural, =1{{selected_count} de # correo electrónico}other{{selected_count} de # correos electrónicos}}"</string>
     <string name="contact_item_phones_selected_count" msgid="4762497214231618256">"{total_count,plural, =1{{selected_count} de # número de teléfono}other{{selected_count} de # números de teléfono}}"</string>
@@ -49,6 +48,7 @@
     <string name="contact_item_selected_content_description" msgid="2909197675609882501">"Contacto seleccionado: %1$s"</string>
     <string name="selection_bottom_bar_clear_button_content_description" msgid="7573236319352718670">"Borrar selección"</string>
     <string name="selection_bottom_bar_preview_button_label" msgid="2700542796344166696">"Previsualizar"</string>
+    <string name="selection_bottom_bar_preview_button_content_description" msgid="3351966150932170916">"Previsualizar os contactos seleccionados"</string>
     <string name="selection_bottom_bar_back_button_label" msgid="6447375742968584743">"Atrás"</string>
     <string name="selection_bottom_bar_done_button_label" msgid="6954303718344998674">"Feito"</string>
     <string name="privacy_banner_description" msgid="8397685763338639247">"%1$s só terá acceso á información dos contactos que selecciones"</string>
@@ -56,16 +56,20 @@
     <string name="privacy_banner_dismiss" msgid="3453400533805574139">"Pechar"</string>
     <string name="title_top_bar_back_button_content_description" msgid="7162880372713819715">"Volver"</string>
     <string name="preview_screen_title" msgid="2852036336424026274">"Previsualizar"</string>
+    <string name="preview_screen_content_description" msgid="7475368414223967934">"Vista previa dos contactos seleccionados"</string>
     <string name="default_calling_app_name" msgid="5345125341557406609">"Esta aplicación"</string>
     <string name="privacy_details_menu_label" msgid="497348969731766203">"Privacidade dos teus contactos"</string>
     <string name="no_contacts_title" msgid="9093698629001614808">"Aínda non tes ningún contacto"</string>
+    <string name="no_email_contacts_title" msgid="501276640394262467">"Ningún contacto con correo electrónico"</string>
+    <string name="no_phone_contacts_title" msgid="3446367223904876925">"Ningún contacto con número de teléfono"</string>
+    <string name="no_custom_details_contacts_title" msgid="8492259954778971307">"Ningún contacto cos datos requiridos"</string>
     <string name="no_contacts_description" msgid="2146615362021064099">"Os contactos que crees ou importes no teu dispositivo mostraranse aquí"</string>
+    <string name="no_results_found" msgid="8513853958245248109">"Non se atopou ningún resultado"</string>
+    <string name="no_results_found_description" msgid="3316948006890920245">"Proba a buscar cunha ortografía diferente"</string>
     <string name="user_type_personal" msgid="45376141973820399">"Persoal"</string>
     <string name="user_type_unknown_label" msgid="7034460972310129198">"Usuario descoñecido"</string>
     <string name="picker_profile_paused_title" msgid="4083321530415544679">"As aplicacións do perfil %s están en pausa"</string>
     <string name="picker_profile_paused_msg" msgid="2824051504891136577">"Para abrir os contactos do perfil %1$s, activa as aplicacións do perfil %2$s e téntao de novo"</string>
-    <!-- no translation found for picker_profile_blocked_admin_title (120810913376185332) -->
-    <skip />
-    <!-- no translation found for picker_profile_blocked_admin_msg (3792456887042138155) -->
-    <skip />
+    <string name="picker_profile_blocked_admin_title" msgid="120810913376185332">"A persoa responsable de informática bloqueou o acceso"</string>
+    <string name="picker_profile_blocked_admin_msg" msgid="3792456887042138155">"Ponte en contacto con ela se tes algunha pregunta"</string>
 </resources>

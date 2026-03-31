@@ -32,7 +32,6 @@
     <string name="favorites_header_icon_content_description" msgid="7094941017377292492">"ໄອຄອນດາວ"</string>
     <string name="emoji_header_icon_content_description" msgid="2926727446702186759">"ໄອຄອນຍິ້ມ"</string>
     <string name="profile_switcher_content_description" msgid="4180951376809274279">"ສະຫຼັບໂປຣໄຟລ໌"</string>
-    <string name="privacy_info_content_description" msgid="1633879608858355544">"ຂໍ້ມູນຄວາມເປັນສ່ວນຕົວ"</string>
     <string name="scrubber_handle_content_description" msgid="1435669253806161568">"ດ້າມຈັບສຳລັບເລື່ອນຢ່າງວ່ອງໄວ"</string>
     <string name="contact_avatar_profile_picture_content_description" msgid="4077599609642932184">"ຮູບໂປຣໄຟລ໌ຂອງລາຍຊື່ຜູ້ຕິດຕໍ່"</string>
     <string name="contact_avatar_initial_content_description" msgid="8441303818086750337">"ຊື່ຫຍໍ້ຂອງລາຍຊື່ຜູ້ຕິດຕໍ່"</string>
@@ -41,7 +40,7 @@
     <string name="contact_item_collapse_button_content_description" msgid="6742731080975214281">"ຫຍໍ້ລົງ"</string>
     <string name="contact_item_phone_icon_content_description" msgid="8117150273224121391">"ໂທລະສັບ"</string>
     <string name="contact_item_email_icon_content_description" msgid="286900034009619231">"ອີເມວ"</string>
-    <string name="contact_item_emails_count" msgid="3836424032662346956">"{count,plural, =1{# ອີເມວ}other{# ອີເມວ}}"</string>
+    <string name="contact_item_emails_count" msgid="2351800816629653553">"{count,plural, =1{ທີ່ຢູ່ອີເມວ # ລາຍການ}other{ທີ່ຢູ່ອີເມວ # ລາຍການ}}"</string>
     <string name="contact_item_phones_count" msgid="1433705901810867685">"{count,plural, =1{# ເບີໂທລະສັບ}other{# ເບີໂທລະສັບ}}"</string>
     <string name="contact_item_emails_selected_count" msgid="5996362003818614724">"{total_count,plural, =1{ອີເມວ {selected_count} ຈາກທັງໝົດ # ສະບັບ}other{ອີເມວ {selected_count} ຈາກທັງໝົດ # ສະບັບ}}"</string>
     <string name="contact_item_phones_selected_count" msgid="4762497214231618256">"{total_count,plural, =1{ເບີໂທລະສັບ {selected_count} ຈາກທັງໝົດ # ເບີ}other{ເບີໂທລະສັບ {selected_count} ຈາກທັງໝົດ # ເບີ}}"</string>
@@ -49,6 +48,7 @@
     <string name="contact_item_selected_content_description" msgid="2909197675609882501">"ເລືອກ %1$s ແລ້ວ"</string>
     <string name="selection_bottom_bar_clear_button_content_description" msgid="7573236319352718670">"ລຶບລ້າງການເລືອກ"</string>
     <string name="selection_bottom_bar_preview_button_label" msgid="2700542796344166696">"ສະແດງຕົວຢ່າງ"</string>
+    <string name="selection_bottom_bar_preview_button_content_description" msgid="3351966150932170916">"ສະແດງຕົວຢ່າງລາຍຊື່ຜູ້ຕິດຕໍ່ທີ່ເລືອກ"</string>
     <string name="selection_bottom_bar_back_button_label" msgid="6447375742968584743">"ກັບຄືນ"</string>
     <string name="selection_bottom_bar_done_button_label" msgid="6954303718344998674">"ແລ້ວໆ"</string>
     <string name="privacy_banner_description" msgid="8397685763338639247">"%1$s ຈະມີສິດເຂົ້າເຖິງຂໍ້ມູນຈາກລາຍຊື່ຜູ້ຕິດຕໍ່ທີ່ທ່ານເລືອກເທົ່ານັ້ນ"</string>
@@ -56,16 +56,20 @@
     <string name="privacy_banner_dismiss" msgid="3453400533805574139">"ປິດໄວ້"</string>
     <string name="title_top_bar_back_button_content_description" msgid="7162880372713819715">"ກັບຄືນ"</string>
     <string name="preview_screen_title" msgid="2852036336424026274">"ຕົວຢ່າງ"</string>
+    <string name="preview_screen_content_description" msgid="7475368414223967934">"ຕົວຢ່າງຂອງລາຍຊື່ຜູ້ຕິດຕໍ່ທີ່ເລືອກ"</string>
     <string name="default_calling_app_name" msgid="5345125341557406609">"ແອັບນີ້"</string>
     <string name="privacy_details_menu_label" msgid="497348969731766203">"ຄວາມເປັນສ່ວນຕົວຂອງລາຍຊື່ຜູ້ຕິດຕໍ່ຂອງທ່ານ"</string>
     <string name="no_contacts_title" msgid="9093698629001614808">"ຍັງບໍ່ມີລາຍຊື່ຜູ້ຕິດຕໍ່"</string>
+    <string name="no_email_contacts_title" msgid="501276640394262467">"ບໍ່ມີລາຍຊື່ຜູ້ຕິດຕໍ່ທີ່ມີທີ່ຢູ່ອີເມວ"</string>
+    <string name="no_phone_contacts_title" msgid="3446367223904876925">"ບໍ່ມີລາຍຊື່ຜູ້ຕິດຕໍ່ທີ່ມີເບີໂທລະສັບ"</string>
+    <string name="no_custom_details_contacts_title" msgid="8492259954778971307">"ບໍ່ມີລາຍຊື່ຜູ້ຕິດຕໍ່ທີ່ມີຂໍ້ມູນທີ່ຈຳເປັນ"</string>
     <string name="no_contacts_description" msgid="2146615362021064099">"ລາຍຊື່ຜູ້ຕິດຕໍ່ທີ່ທ່ານສ້າງ ຫຼື ນຳເຂົ້າໃສ່ອຸປະກອນຂອງທ່ານຈະປາກົດບ່ອນນີ້"</string>
+    <string name="no_results_found" msgid="8513853958245248109">"ບໍ່ພົບຜົນການຊອກຫາ"</string>
+    <string name="no_results_found_description" msgid="3316948006890920245">"ລອງຊອກຫາດ້ວຍການສະກົດແບບອື່ນ"</string>
     <string name="user_type_personal" msgid="45376141973820399">"ສ່ວນຕົວ"</string>
     <string name="user_type_unknown_label" msgid="7034460972310129198">"ຜູ້ໃຊ້ທີ່ບໍ່ຮູ້ຈັກ"</string>
     <string name="picker_profile_paused_title" msgid="4083321530415544679">"ແອັບ %s ຢຸດຊົ່ວຄາວ"</string>
     <string name="picker_profile_paused_msg" msgid="2824051504891136577">"ເພື່ອເປີດລາຍຊື່ຜູ້ຕິດຕໍ່ %1$s, ໃຫ້ເປີດແອັບ %2$s ຂອງທ່ານແລ້ວລອງໃໝ່"</string>
-    <!-- no translation found for picker_profile_blocked_admin_title (120810913376185332) -->
-    <skip />
-    <!-- no translation found for picker_profile_blocked_admin_msg (3792456887042138155) -->
-    <skip />
+    <string name="picker_profile_blocked_admin_title" msgid="120810913376185332">"ຜູ້ເບິ່ງແຍງໄອທີຂອງທ່ານບລັອກການເຂົ້າເຖິງ"</string>
+    <string name="picker_profile_blocked_admin_msg" msgid="3792456887042138155">"ກະລຸນາຕິດຕໍ່ເຂົາເຈົ້າຫາກທ່ານມີຄຳຖາມໃດໆ"</string>
 </resources>

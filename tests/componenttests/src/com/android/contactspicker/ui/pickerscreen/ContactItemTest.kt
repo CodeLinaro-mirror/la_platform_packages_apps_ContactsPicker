@@ -22,17 +22,28 @@ import android.icu.text.MessageFormat
 import android.platform.test.annotations.RequiresFlagsEnabled
 import android.platform.test.flag.junit.CheckFlagsRule
 import android.platform.test.flag.junit.DeviceFlagsValueProvider
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasAnyDescendant
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performSemanticsAction
+import androidx.compose.ui.text.TextLayoutResult
+import androidx.compose.ui.text.VerbatimTtsAnnotation
+import androidx.compose.ui.text.style.ResolvedTextDirection
+import androidx.compose.ui.text.style.TextDirection
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.contactspicker.R
@@ -264,6 +275,149 @@ class ContactItemTest {
     }
 
     @Test
+    fun contactItem_phoneContact_secondaryTextHasVerbatimAnnotation() {
+        val testSinglePhoneContact = ContactTestDataFactory.GENERIC_PHONE_CONTACT
+        createContactItemWithEmptySelection(testSinglePhoneContact)
+
+        val phoneNumber = testSinglePhoneContact.phones.first().number
+        val node = composeTestRule.onNodeWithText(phoneNumber).fetchSemanticsNode()
+
+        val annotatedString =
+            node.config[SemanticsProperties.Text].find { it.text == phoneNumber }
+                ?: error("Phone number text not found in semantics node")
+
+        // Explicitly verify the VerbatimTtsAnnotation exists
+        val annotations = annotatedString.getTtsAnnotations(0, phoneNumber.length)
+        val hasVerbatimAnnotation = annotations.any { it.item is VerbatimTtsAnnotation }
+        assertThat(hasVerbatimAnnotation).isTrue()
+    }
+
+    @Test
+    fun contactItem_emailContact_secondaryTextDoesNotHaveVerbatimAnnotation() {
+        val testSinglePhoneContact = ContactTestDataFactory.GENERIC_EMAIL_CONTACT
+        createContactItemWithEmptySelection(testSinglePhoneContact)
+
+        val email = testSinglePhoneContact.emails.first().address
+        val node = composeTestRule.onNodeWithText(email).fetchSemanticsNode()
+
+        val annotatedString =
+            node.config[SemanticsProperties.Text].find { it.text == email }
+                ?: error("Email address text not found in semantics node")
+
+        // Explicitly verify the VerbatimTtsAnnotation does not exist
+        val annotations = annotatedString.getTtsAnnotations(0, email.length)
+        val hasVerbatimAnnotation = annotations.any { it.item is VerbatimTtsAnnotation }
+        assertThat(hasVerbatimAnnotation).isFalse()
+    }
+
+    @Test
+    fun contactItem_withMultiplePhones_hasVerbatimAnnotation() {
+        val testMultiPhoneContact = ContactTestDataFactory.GENERIC_MULTI_PHONE_CONTACT
+        createContactItemWithEmptySelection(testMultiPhoneContact)
+        // Expand
+        composeTestRule.onNodeWithText(testMultiPhoneContact.displayName).performClick()
+
+        testMultiPhoneContact.phones.forEach { phone ->
+            val node = composeTestRule.onNodeWithText(phone.number).fetchSemanticsNode()
+
+            val annotatedString =
+                node.config[SemanticsProperties.Text].find { it.text == phone.number }
+                    ?: error("Phone number text not found in semantics node")
+
+            // Explicitly verify the VerbatimTtsAnnotation exists
+            val annotations = annotatedString.getTtsAnnotations(0, phone.number.length)
+            val hasVerbatimAnnotation = annotations.any { it.item is VerbatimTtsAnnotation }
+            assertThat(hasVerbatimAnnotation).isTrue()
+        }
+    }
+
+    @Test
+    fun contactItem_withMultipleEmails_doesNotHaveVerbatimAnnotation() {
+        val testMultiEmailContact = ContactTestDataFactory.GENERIC_MULTI_EMAIL_CONTACT
+        createContactItemWithEmptySelection(testMultiEmailContact)
+        // Expand
+        composeTestRule.onNodeWithText(testMultiEmailContact.displayName).performClick()
+
+        testMultiEmailContact.emails.forEach { email ->
+            val node = composeTestRule.onNodeWithText(email.address).fetchSemanticsNode()
+
+            val annotatedString =
+                node.config[SemanticsProperties.Text].find { it.text == email.address }
+                    ?: error("Email address text not found in semantics node")
+
+            // Explicitly verify the VerbatimTtsAnnotation does not exist
+            val annotations = annotatedString.getTtsAnnotations(0, email.address.length)
+            val hasVerbatimAnnotation = annotations.any { it.item is VerbatimTtsAnnotation }
+            assertThat(hasVerbatimAnnotation).isFalse()
+        }
+    }
+
+    @Test
+    fun secondaryText_phoneNumberInRtl_isForcedLtr() {
+        val contact = ContactTestDataFactory.GENERIC_PHONE_CONTACT
+
+        composeTestRule.setContent {
+            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                ContactItem(
+                    contact = contact,
+                    position = ItemPosition.ONLY,
+                    selectedEntries = emptySet(),
+                    isMultiSelectEnabled = true,
+                    isSearchMode = false,
+                    onToggleContactSelection = {},
+                    onToggleEntrySelection = { _, _ -> },
+                )
+            }
+        }
+        composeTestRule
+            .onNodeWithText(contact.phones.first().number, useUnmergedTree = true)
+            .assertTextDirection(TextDirection.Ltr, ResolvedTextDirection.Ltr)
+    }
+
+    @Test
+    fun secondaryText_multiPhoneInRtl_expanded_isForcedLtr() {
+        val contact = ContactTestDataFactory.GENERIC_MULTI_PHONE_CONTACT
+        composeTestRule.setContent {
+            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                ContactItem(
+                    contact = contact,
+                    position = ItemPosition.ONLY,
+                    selectedEntries = emptySet(),
+                    isMultiSelectEnabled = true,
+                    isSearchMode = false,
+                    onToggleContactSelection = {},
+                    onToggleEntrySelection = { _, _ -> },
+                )
+            }
+        }
+        // expand
+        composeTestRule.onNodeWithText(contact.displayName).performClick()
+
+        contact.phones.forEach { phone ->
+            composeTestRule
+                .onNodeWithText(phone.number)
+                .assertTextDirection(TextDirection.Ltr, ResolvedTextDirection.Ltr)
+        }
+    }
+
+    private fun SemanticsNodeInteraction.assertTextDirection(
+        requested: TextDirection,
+        resolved: ResolvedTextDirection,
+    ) {
+        val results = mutableListOf<TextLayoutResult>()
+        performSemanticsAction(SemanticsActions.GetTextLayoutResult) { it(results) }
+        val layoutResult = results.first()
+
+        val actualRequested =
+            layoutResult.layoutInput.text.paragraphStyles.firstOrNull()?.item?.textDirection
+                ?: TextDirection.Unspecified
+        assertThat(actualRequested).isEqualTo(requested)
+
+        val actualResolved = layoutResult.getParagraphDirection(0)
+        assertThat(actualResolved).isEqualTo(resolved)
+    }
+
+    @Test
     fun selectableAvatar_showsCheckmark_whenFullySelected() {
         val testMultiEmailContact = ContactTestDataFactory.GENERIC_MULTI_EMAIL_CONTACT
         val selectedEntries = testMultiEmailContact.emails.map { it.id }.toSet()
@@ -469,6 +623,30 @@ class ContactItemTest {
     }
 
     @Test
+    fun selectableAvatarClick_whenSelectedEntryInSingleSelectMode_callsOnToggleContactSelection() {
+        val contact = ContactTestDataFactory.GENERIC_DISPLAY_NAME_CONTACT
+        assertAvatarClickBehavior(
+            contact = contact,
+            selectedEntries = setOf(contact.id),
+            isMultiSelectEnabled = false,
+            expectToggleContactCalled = true,
+            expectItemExpanded = false,
+        )
+    }
+
+    @Test
+    fun selectableAvatar_whenSelectedContactInSingleSelectMode_callsOnToggleContactSelection() {
+        val contact = ContactTestDataFactory.GENERIC_MULTI_PHONE_CONTACT
+        assertAvatarClickBehavior(
+            contact = contact,
+            selectedEntries = setOf(contact.phones.first().id),
+            isMultiSelectEnabled = false,
+            expectToggleContactCalled = true,
+            expectItemExpanded = false,
+        )
+    }
+
+    @Test
     fun entryClick_withSingleEmailContact_callsOnToggleContactSelection() {
         assertEntryClickBehavior(
             contact = ContactTestDataFactory.GENERIC_EMAIL_CONTACT,
@@ -539,6 +717,7 @@ class ContactItemTest {
     /** Helper function to test the click behavior of the avatar in a [ContactItem]. */
     private fun assertAvatarClickBehavior(
         contact: Contact,
+        selectedEntries: Set<Long> = emptySet(), // default no selection
         isMultiSelectEnabled: Boolean,
         expectToggleContactCalled: Boolean,
         expectItemExpanded: Boolean,
@@ -548,7 +727,7 @@ class ContactItemTest {
         composeTestRule.setContent {
             ContactItem(
                 contact = contact,
-                selectedEntries = emptySet(),
+                selectedEntries = selectedEntries,
                 position = ItemPosition.ONLY,
                 isMultiSelectEnabled = isMultiSelectEnabled,
                 isSearchMode = false,
@@ -557,7 +736,18 @@ class ContactItemTest {
             )
         }
 
-        composeTestRule.onNode(hasTestTag(AVATAR_TEST_TAG), useUnmergedTree = true).performClick()
+        val avatarNode =
+            if (selectedEntries.isEmpty()) {
+                composeTestRule.onNode(hasTestTag(AVATAR_TEST_TAG), useUnmergedTree = true)
+            } else {
+                composeTestRule.onNodeWithContentDescription(
+                    context.getString(
+                        R.string.contact_item_selected_content_description,
+                        contact.displayName,
+                    )
+                )
+            }
+        avatarNode.performClick()
 
         assertThat(onToggleContactCalled).isEqualTo(expectToggleContactCalled)
         assertThat(onToggleEntryCalled).isFalse()
