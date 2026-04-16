@@ -34,7 +34,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.hideFromAccessibility
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -43,6 +42,7 @@ import com.android.contactspicker.R
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 
+const val AVATAR_SIZE = 40
 internal const val AVATAR_TEST_TAG = "contact_avatar"
 internal const val AVATAR_FALLBACK_PERSON_ICON_TEST_TAG = "avatar_fallback_person_icon"
 
@@ -57,10 +57,9 @@ internal const val AVATAR_FALLBACK_PERSON_ICON_TEST_TAG = "avatar_fallback_perso
 fun Avatar(displayName: String, profilePictureUri: String?) {
     Box(
         modifier =
-            Modifier.size(40.dp)
+            Modifier.size(AVATAR_SIZE.dp)
                 .clip(CircleShape) // Clip the whole container
-                .testTag(AVATAR_TEST_TAG)
-                .semantics { hideFromAccessibility() },
+                .testTag(AVATAR_TEST_TAG),
         contentAlignment = Alignment.Center,
     ) {
         if (!profilePictureUri.isNullOrBlank()) {

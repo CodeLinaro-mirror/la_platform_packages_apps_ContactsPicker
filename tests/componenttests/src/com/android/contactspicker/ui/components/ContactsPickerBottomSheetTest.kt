@@ -77,7 +77,8 @@ class ContactsPickerBottomSheetTest {
     private val testContact = ContactTestDataFactory.GENERIC_DISPLAY_NAME_CONTACT
     private val testSuccessState =
         ContactsListState.Success(
-            listOf(testContact),
+            availableContactsGroups =
+                ContactTestDataFactory.groupContactsForTest(listOf(testContact)),
             selectedContacts = selectedContacts,
             isMultiSelectEnabled = false,
             callingAppName = null,
@@ -157,7 +158,10 @@ class ContactsPickerBottomSheetTest {
                     uiState =
                         mutableStateOf(
                             ContactsListState.Success(
-                                availableContacts = listOf(testContact),
+                                availableContactsGroups =
+                                    ContactTestDataFactory.groupContactsForTest(
+                                        listOf(testContact)
+                                    ),
                                 selectedContacts = selectedContacts,
                                 isMultiSelectEnabled = false,
                                 callingAppName = null,
@@ -175,6 +179,8 @@ class ContactsPickerBottomSheetTest {
                     onExitSearch = {},
                     onPreviewClicked = {},
                     onBackFromPreview = {},
+                    onPrivacyDetailsClicked = {},
+                    onBackFromPrivacyDetails = {},
                     onPrivacyBannerDismissRequest = {},
                     onProfileClicked = {},
                     onDismissProfileBlockedDialog = {},
@@ -208,7 +214,10 @@ class ContactsPickerBottomSheetTest {
                     uiState =
                         mutableStateOf(
                             ContactsListState.Success(
-                                availableContacts = listOf(testContact),
+                                availableContactsGroups =
+                                    ContactTestDataFactory.groupContactsForTest(
+                                        listOf(testContact)
+                                    ),
                                 selectedContacts = selectedContacts,
                                 isMultiSelectEnabled = false,
                                 callingAppName = null,
@@ -226,6 +235,8 @@ class ContactsPickerBottomSheetTest {
                     onExitSearch = {},
                     onPreviewClicked = {},
                     onBackFromPreview = {},
+                    onPrivacyDetailsClicked = {},
+                    onBackFromPrivacyDetails = {},
                     onPrivacyBannerDismissRequest = {},
                     onProfileClicked = {},
                     onDismissProfileBlockedDialog = {},
@@ -275,7 +286,10 @@ class ContactsPickerBottomSheetTest {
                     uiState =
                         mutableStateOf(
                             ContactsListState.Success(
-                                availableContacts = listOf(testContact),
+                                availableContactsGroups =
+                                    ContactTestDataFactory.groupContactsForTest(
+                                        listOf(testContact)
+                                    ),
                                 selectedContacts = selectedContacts,
                                 false,
                                 callingAppName = null,
@@ -293,6 +307,8 @@ class ContactsPickerBottomSheetTest {
                     onExitSearch = {},
                     onPreviewClicked = {},
                     onBackFromPreview = {},
+                    onPrivacyDetailsClicked = {},
+                    onBackFromPrivacyDetails = {},
                     onPrivacyBannerDismissRequest = {},
                     onProfileClicked = {},
                     onDismissProfileBlockedDialog = {},
@@ -328,7 +344,8 @@ class ContactsPickerBottomSheetTest {
                 uiState =
                     mutableStateOf(
                         ContactsListState.Success(
-                            availableContacts = listOf(testContact),
+                            availableContactsGroups =
+                                ContactTestDataFactory.groupContactsForTest(listOf(testContact)),
                             selectedContacts =
                                 contactsSelectionOf(testContact.id, setOf(testContact.id)),
                             isMultiSelectEnabled = false,
@@ -347,6 +364,8 @@ class ContactsPickerBottomSheetTest {
                 onExitSearch = {},
                 onPreviewClicked = {},
                 onBackFromPreview = {},
+                onPrivacyDetailsClicked = {},
+                onBackFromPrivacyDetails = {},
                 onPrivacyBannerDismissRequest = {},
                 onProfileClicked = {},
                 onDismissProfileBlockedDialog = {},
@@ -394,6 +413,8 @@ class ContactsPickerBottomSheetTest {
                     onExitSearch = {},
                     onPreviewClicked = {},
                     onBackFromPreview = { onBackFromPreview = true },
+                    onPrivacyDetailsClicked = {},
+                    onBackFromPrivacyDetails = {},
                     onPrivacyBannerDismissRequest = {},
                     onProfileClicked = {},
                     onDismissProfileBlockedDialog = {},
@@ -418,7 +439,10 @@ class ContactsPickerBottomSheetTest {
                     uiState =
                         mutableStateOf(
                             ContactsListState.Success(
-                                availableContacts = listOf(testContact),
+                                availableContactsGroups =
+                                    ContactTestDataFactory.groupContactsForTest(
+                                        listOf(testContact)
+                                    ),
                                 selectedContacts =
                                     contactsSelectionOf(testContact.id, setOf(testContact.id)),
                                 isMultiSelectEnabled = false,
@@ -437,6 +461,8 @@ class ContactsPickerBottomSheetTest {
                     onExitSearch = {},
                     onPreviewClicked = {},
                     onBackFromPreview = { onBackFromPreview = true },
+                    onPrivacyDetailsClicked = {},
+                    onBackFromPrivacyDetails = {},
                     onPrivacyBannerDismissRequest = {},
                     onProfileClicked = {},
                     onDismissProfileBlockedDialog = {},
@@ -495,7 +521,10 @@ class ContactsPickerBottomSheetTest {
                     uiState =
                         mutableStateOf(
                             ContactsListState.Success(
-                                availableContacts = listOf(testContact),
+                                availableContactsGroups =
+                                    ContactTestDataFactory.groupContactsForTest(
+                                        listOf(testContact)
+                                    ),
                                 selectedContacts = selectedContacts,
                                 isMultiSelectEnabled = true,
                                 callingAppName = null,
@@ -513,6 +542,8 @@ class ContactsPickerBottomSheetTest {
                     onExitSearch = {},
                     onPreviewClicked = {},
                     onBackFromPreview = {},
+                    onPrivacyDetailsClicked = {},
+                    onBackFromPrivacyDetails = {},
                     onPrivacyBannerDismissRequest = {},
                     onProfileClicked = {},
                     onDismissProfileBlockedDialog = {},
@@ -554,7 +585,10 @@ class ContactsPickerBottomSheetTest {
                     uiState =
                         mutableStateOf(
                             ContactsListState.Success(
-                                availableContacts = listOf(testContact),
+                                availableContactsGroups =
+                                    ContactTestDataFactory.groupContactsForTest(
+                                        listOf(testContact)
+                                    ),
                                 selectedContacts = selectedContacts,
                                 isMultiSelectEnabled = true,
                                 callingAppName = null,
@@ -572,6 +606,8 @@ class ContactsPickerBottomSheetTest {
                     onExitSearch = {},
                     onPreviewClicked = {},
                     onBackFromPreview = {},
+                    onPrivacyDetailsClicked = {},
+                    onBackFromPrivacyDetails = {},
                     onPrivacyBannerDismissRequest = {},
                     onProfileClicked = {},
                     onDismissProfileBlockedDialog = {},
@@ -621,6 +657,8 @@ class ContactsPickerBottomSheetTest {
                     onExitSearch = {},
                     onPreviewClicked = {},
                     onBackFromPreview = {},
+                    onPrivacyDetailsClicked = {},
+                    onBackFromPrivacyDetails = {},
                     onPrivacyBannerDismissRequest = {},
                     onProfileClicked = {},
                     onDismissProfileBlockedDialog = {},

@@ -19,6 +19,9 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Mood
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -30,7 +33,12 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.android.contactspicker.ui.pickerscreen.SectionKey
+import com.android.contactspicker.R
+import com.android.contactspicker.data.model.SectionKey
+import com.android.contactspicker.data.model.SectionKey.EmojiSection
+import com.android.contactspicker.data.model.SectionKey.FavoriteSection
+import com.android.contactspicker.data.model.SectionKey.LetterKey
+import com.android.contactspicker.data.model.SectionKey.StringKey
 
 // TODO(b/468919056): Add FadeIn/FadeOut animation for ScrubberLabel
 /**
@@ -65,7 +73,7 @@ fun ScrubberLabel(sectionKey: SectionKey?) {
 @Composable
 private fun ScrubberContent(targetKey: SectionKey) {
     when (targetKey) {
-        is SectionKey.LetterKey ->
+        is LetterKey ->
             Text(
                 text = targetKey.letter.toString(),
                 style = MaterialTheme.typography.displayLarge,
@@ -73,17 +81,26 @@ private fun ScrubberContent(targetKey: SectionKey) {
                 textAlign = TextAlign.Center,
                 modifier = Modifier.testTag(SCRUBBER_LABEL_TEXT_TEST_TAG),
             )
-        is SectionKey.FavoriteIconKey ->
+        is StringKey ->
+            Text(
+                text = targetKey.header,
+                style = MaterialTheme.typography.displayLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.testTag(SCRUBBER_LABEL_TEXT_TEST_TAG),
+            )
+        is FavoriteSection ->
             Image(
-                imageVector = targetKey.icon,
-                contentDescription = stringResource(targetKey.contentDescriptionRes),
+                imageVector = Icons.Filled.Star,
+                contentDescription =
+                    stringResource(R.string.favorites_header_icon_content_description),
                 colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface),
                 modifier = Modifier.size(56.dp).testTag(SCRUBBER_LABEL_FAVORITE_ICON_TEST_TAG),
             )
-        is SectionKey.EmojiIconKey ->
+        is EmojiSection ->
             Image(
-                imageVector = targetKey.icon,
-                contentDescription = stringResource(targetKey.contentDescriptionRes),
+                imageVector = Icons.Filled.Mood,
+                contentDescription = stringResource(R.string.emoji_header_icon_content_description),
                 colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface),
                 modifier = Modifier.size(56.dp).testTag(SCRUBBER_LABEL_EMOJI_ICON_TEST_TAG),
             )

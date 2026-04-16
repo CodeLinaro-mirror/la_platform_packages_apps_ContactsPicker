@@ -22,11 +22,13 @@ import android.icu.text.MessageFormat
 import android.platform.test.annotations.RequiresFlagsEnabled
 import android.platform.test.flag.junit.CheckFlagsRule
 import android.platform.test.flag.junit.DeviceFlagsValueProvider
+import android.provider.ContactsContract
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assert
@@ -37,6 +39,7 @@ import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.onParent
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.text.TextLayoutResult
@@ -74,11 +77,7 @@ class ContactItemTest {
         createContactItemWithEmptySelection(testDisplayNameContact)
 
         composeTestRule.onNodeWithText(testDisplayNameContact.displayName).assertIsDisplayed()
-        composeTestRule
-            .onNodeWithContentDescription(
-                context.getString(R.string.contact_item_expand_button_content_description)
-            )
-            .assertDoesNotExist()
+        assertRowClickLabel(testDisplayNameContact.displayName, null)
     }
 
     @Test
@@ -90,11 +89,7 @@ class ContactItemTest {
         composeTestRule
             .onNodeWithText(testSingleEmailContact.emails.first().address)
             .assertIsDisplayed()
-        composeTestRule
-            .onNodeWithContentDescription(
-                context.getString(R.string.contact_item_expand_button_content_description)
-            )
-            .assertDoesNotExist()
+        assertRowClickLabel(testSingleEmailContact.displayName, null)
     }
 
     @Test
@@ -106,12 +101,7 @@ class ContactItemTest {
         composeTestRule
             .onNodeWithText(testSinglePhoneContact.phones.first().number)
             .assertIsDisplayed()
-        // The content description for the expand button should not exist.
-        composeTestRule
-            .onNodeWithContentDescription(
-                context.getString(R.string.contact_item_expand_button_content_description)
-            )
-            .assertDoesNotExist()
+        assertRowClickLabel(testSinglePhoneContact.displayName, null)
     }
 
     @Test
@@ -123,11 +113,10 @@ class ContactItemTest {
             totalCountMessage(R.string.contact_item_emails_count, testMultiEmailContact.emails.size)
         composeTestRule.onNodeWithText(testMultiEmailContact.displayName).assertIsDisplayed()
         composeTestRule.onNodeWithText(totalCountMessage).assertIsDisplayed()
-        composeTestRule
-            .onNodeWithContentDescription(
-                context.getString(R.string.contact_item_expand_button_content_description)
-            )
-            .assertIsDisplayed()
+
+        val expandLabel = context.getString(R.string.contact_item_expand_button_content_description)
+        assertRowClickLabel(testMultiEmailContact.displayName, expandLabel)
+
         // Emails should not be visible initially
         composeTestRule
             .onNodeWithText(testMultiEmailContact.emails.first().address)
@@ -169,11 +158,10 @@ class ContactItemTest {
 
         composeTestRule.onNodeWithText(testMultiPhoneContact.displayName).assertIsDisplayed()
         composeTestRule.onNodeWithText(totalCountMessage).assertIsDisplayed()
-        composeTestRule
-            .onNodeWithContentDescription(
-                context.getString(R.string.contact_item_expand_button_content_description)
-            )
-            .assertIsDisplayed()
+
+        val expandLabel = context.getString(R.string.contact_item_expand_button_content_description)
+        assertRowClickLabel(testMultiPhoneContact.displayName, expandLabel)
+
         // Phones should not be visible initially
         composeTestRule
             .onNodeWithText(testMultiPhoneContact.phones.first().number)
@@ -213,16 +201,17 @@ class ContactItemTest {
         val testMultiEmailContact = ContactTestDataFactory.GENERIC_MULTI_EMAIL_CONTACT
         createContactItemWithEmptySelection(testMultiEmailContact)
 
+        val expandLabel = context.getString(R.string.contact_item_expand_button_content_description)
+        val collapseLabel =
+            context.getString(R.string.contact_item_collapse_button_content_description)
+
         // Expand
         composeTestRule
             .onNodeWithText(testMultiEmailContact.displayName, useUnmergedTree = true)
             .performClick()
 
-        composeTestRule
-            .onNodeWithContentDescription(
-                context.getString(R.string.contact_item_collapse_button_content_description)
-            )
-            .assertIsDisplayed()
+        assertRowClickLabel(testMultiEmailContact.displayName, collapseLabel)
+
         testMultiEmailContact.emails.forEach { email ->
             composeTestRule.onNodeWithText(email.address).assertIsDisplayed()
             assertThat(email.label).isNotNull()
@@ -232,11 +221,8 @@ class ContactItemTest {
         // Collapse
         composeTestRule.onNodeWithText(testMultiEmailContact.displayName).performClick()
 
-        composeTestRule
-            .onNodeWithContentDescription(
-                context.getString(R.string.contact_item_expand_button_content_description)
-            )
-            .assertIsDisplayed()
+        assertRowClickLabel(testMultiEmailContact.displayName, expandLabel)
+
         composeTestRule
             .onNodeWithText(testMultiEmailContact.emails.first().address)
             .assertDoesNotExist()
@@ -247,14 +233,15 @@ class ContactItemTest {
         val testMultiPhoneContact = ContactTestDataFactory.GENERIC_MULTI_PHONE_CONTACT
         createContactItemWithEmptySelection(testMultiPhoneContact)
 
+        val expandLabel = context.getString(R.string.contact_item_expand_button_content_description)
+        val collapseLabel =
+            context.getString(R.string.contact_item_collapse_button_content_description)
+
         // Expand
         composeTestRule.onNodeWithText(testMultiPhoneContact.displayName).performClick()
 
-        composeTestRule
-            .onNodeWithContentDescription(
-                context.getString(R.string.contact_item_collapse_button_content_description)
-            )
-            .assertIsDisplayed()
+        assertRowClickLabel(testMultiPhoneContact.displayName, collapseLabel)
+
         testMultiPhoneContact.phones.forEach { phone ->
             composeTestRule.onNodeWithText(phone.number).assertIsDisplayed()
             assertThat(phone.label).isNotNull()
@@ -264,11 +251,8 @@ class ContactItemTest {
         // Collapse
         composeTestRule.onNodeWithText(testMultiPhoneContact.displayName).performClick()
 
-        composeTestRule
-            .onNodeWithContentDescription(
-                context.getString(R.string.contact_item_expand_button_content_description)
-            )
-            .assertIsDisplayed()
+        assertRowClickLabel(testMultiPhoneContact.displayName, expandLabel)
+
         composeTestRule
             .onNodeWithText(testMultiPhoneContact.phones.first().number)
             .assertDoesNotExist()
@@ -353,6 +337,47 @@ class ContactItemTest {
     }
 
     @Test
+    fun displayName_fromPhoneSourceInRtl_isForcedLtr() {
+        // string with numbers and blank spaces
+        val phoneNumber = "+44 123 456"
+
+        val contact =
+            ContactTestDataFactory.GENERIC_PHONE_CONTACT.copy(
+                displayName = phoneNumber,
+                displayNameSource = ContactsContract.DisplayNameSources.PHONE,
+            )
+
+        composeTestRule.setContent {
+            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                ContactItem(
+                    contact = contact,
+                    position = ItemPosition.ONLY,
+                    selectedEntries = emptySet(),
+                    isMultiSelectEnabled = true,
+                    isSearchMode = false,
+                    onToggleContactSelection = {},
+                    onToggleEntrySelection = { _, _ -> },
+                )
+            }
+        }
+
+        // Verify display name resolves to LTR visually
+        composeTestRule
+            .onNodeWithText(contact.displayName, useUnmergedTree = true)
+            .assertTextDirection(TextDirection.Ltr, ResolvedTextDirection.Ltr)
+
+        val node = composeTestRule.onNodeWithText(phoneNumber).fetchSemanticsNode()
+
+        val annotatedString =
+            node.config[SemanticsProperties.Text].find { it.text == phoneNumber }
+                ?: error("Phone number text not found in semantics node")
+
+        val annotations = annotatedString.getTtsAnnotations(0, phoneNumber.length)
+        val hasVerbatimAnnotation = annotations.any { it.item is VerbatimTtsAnnotation }
+        assertThat(hasVerbatimAnnotation).isTrue()
+    }
+
+    @Test
     fun secondaryText_phoneNumberInRtl_isForcedLtr() {
         val contact = ContactTestDataFactory.GENERIC_PHONE_CONTACT
 
@@ -428,7 +453,8 @@ class ContactItemTest {
                 context.getString(
                     R.string.contact_item_selected_content_description,
                     testMultiEmailContact.displayName,
-                )
+                ),
+                useUnmergedTree = true,
             )
             .assertIsDisplayed()
     }
@@ -446,7 +472,8 @@ class ContactItemTest {
                 context.getString(
                     R.string.contact_item_selected_content_description,
                     testMultiEmailContact.displayName,
-                )
+                ),
+                useUnmergedTree = true,
             )
             .assertIsDisplayed()
 
@@ -481,14 +508,7 @@ class ContactItemTest {
         // Verify the expanded entry has Checkbox role
         composeTestRule
             .onNodeWithText(testMultiEmailContact.emails.first().address)
-            .assert(
-                hasAnyDescendant(
-                    SemanticsMatcher.expectValue(
-                        androidx.compose.ui.semantics.SemanticsProperties.Role,
-                        Role.Checkbox,
-                    )
-                )
-            )
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Checkbox))
     }
 
     @Test
@@ -512,14 +532,72 @@ class ContactItemTest {
         // Verify the expanded entry has RadioButton role
         composeTestRule
             .onNodeWithText(testMultiEmailContact.emails.first().address)
-            .assert(
-                hasAnyDescendant(
-                    SemanticsMatcher.expectValue(
-                        androidx.compose.ui.semantics.SemanticsProperties.Role,
-                        Role.RadioButton,
-                    )
-                )
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.RadioButton))
+    }
+
+    @Test
+    fun contactItem_rowHasCorrectSelectionSemantics() {
+        val contact = ContactTestDataFactory.GENERIC_DISPLAY_NAME_CONTACT
+        // Create item in a selected state
+        createContactItem(contact, setOf(contact.id))
+
+        composeTestRule
+            .onNodeWithText(contact.displayName)
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Selected, true))
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Checkbox))
+    }
+
+    @Test
+    fun expandedEntry_reportsSelectionState() {
+        val contact = ContactTestDataFactory.GENERIC_MULTI_EMAIL_CONTACT
+        createContactItemWithEmptySelection(contact)
+
+        // Expand
+        composeTestRule.onNodeWithText(contact.displayName).performClick()
+
+        // Verify the entry explicitly reports it is NOT selected
+        composeTestRule
+            .onNodeWithText(contact.emails.first().address)
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Selected, false))
+    }
+
+    @Test
+    fun contactItem_withMultiEntry_hasSelectAllCustomAction() {
+        val contact = ContactTestDataFactory.GENERIC_MULTI_EMAIL_CONTACT
+        composeTestRule.setContent {
+            ContactItem(
+                contact = contact,
+                position = ItemPosition.ONLY,
+                selectedEntries = emptySet(),
+                isMultiSelectEnabled = true,
+                isSearchMode = false,
+                onToggleContactSelection = {},
+                onToggleEntrySelection = { _, _ -> },
             )
+        }
+
+        val selectAllLabel = context.getString(R.string.a11y_select_all)
+
+        composeTestRule
+            .onNodeWithText(contact.displayName)
+            .assert(SemanticsMatcher.keyIsDefined(SemanticsActions.CustomActions))
+            .assert(
+                SemanticsMatcher("Has Select All Custom Action") { node ->
+                    val customActions = node.config.getOrNull(SemanticsActions.CustomActions)
+                    customActions?.any { it.label == selectAllLabel } == true
+                }
+            )
+    }
+
+    @Test
+    fun contactItem_withSingleEntry_hasNoCustomAction() {
+        val contact = ContactTestDataFactory.GENERIC_DISPLAY_NAME_CONTACT
+        createContactItemWithEmptySelection(contact)
+
+        // Custom action is withheld because Avatar action matches Row action
+        composeTestRule
+            .onNodeWithText(contact.displayName)
+            .assert(SemanticsMatcher.keyNotDefined(SemanticsActions.CustomActions))
     }
 
     @Test
@@ -736,18 +814,46 @@ class ContactItemTest {
             )
         }
 
-        val avatarNode =
-            if (selectedEntries.isEmpty()) {
-                composeTestRule.onNode(hasTestTag(AVATAR_TEST_TAG), useUnmergedTree = true)
-            } else {
-                composeTestRule.onNodeWithContentDescription(
-                    context.getString(
-                        R.string.contact_item_selected_content_description,
-                        contact.displayName,
-                    )
-                )
-            }
-        avatarNode.performClick()
+        val isExpandable =
+            (contact is PhoneContact && contact.phones.size > 1) ||
+                (contact is EmailContact && contact.emails.size > 1)
+        val hasSeparateAvatarAction =
+            isExpandable && (selectedEntries.isNotEmpty() || isMultiSelectEnabled)
+
+        // assert the visibility of the checkmark and avatar varies depending on the selection state
+        val checkMarkNode =
+            composeTestRule.onNodeWithContentDescription(
+                context.getString(
+                    R.string.contact_item_selected_content_description,
+                    contact.displayName,
+                ),
+                useUnmergedTree = true,
+            )
+        val avatarNode = composeTestRule.onNode(hasTestTag(AVATAR_TEST_TAG), useUnmergedTree = true)
+        if (selectedEntries.isEmpty()) {
+            checkMarkNode.assertDoesNotExist()
+            avatarNode.assertIsDisplayed()
+        } else {
+            checkMarkNode.assertIsDisplayed()
+            avatarNode.assertDoesNotExist()
+        }
+
+        // If the avatar has a separate action, its Box is explicitly clickable.
+        // Otherwise, it acts purely visually and touch falls through to the Row.
+        if (hasSeparateAvatarAction) {
+            val visualAvatarNode =
+                if (selectedEntries.isEmpty()) {
+                    avatarNode
+                } else {
+                    checkMarkNode
+                }
+            // Navigate to the clickable SelectableAvatar Box
+            visualAvatarNode.onParent().performClick()
+        } else {
+            // When hasSeparateAvatarAction == false, the avatar isn't distinctly clickable,
+            // so TalkBack / physical touch falls through to the Row itself.
+            composeTestRule.onNodeWithText(contact.displayName).performClick()
+        }
 
         assertThat(onToggleContactCalled).isEqualTo(expectToggleContactCalled)
         assertThat(onToggleEntryCalled).isFalse()
@@ -900,7 +1006,8 @@ class ContactItemTest {
             )
         }
 
-        composeTestRule.onNode(hasTestTag(AVATAR_TEST_TAG), useUnmergedTree = true).performClick()
+        // In searchMode, the avatar is not itself clickable, click on the row
+        composeTestRule.onNodeWithText(contact.displayName).performClick()
 
         assertThat(toggledContactId).isEqualTo(contact.id)
         assertThat(toggledEntryId).isEqualTo(entryId)
@@ -929,7 +1036,8 @@ class ContactItemTest {
                 context.getString(
                     R.string.contact_item_selected_content_description,
                     contact.displayName,
-                )
+                ),
+                useUnmergedTree = true,
             )
             .assertIsDisplayed()
     }
@@ -949,11 +1057,7 @@ class ContactItemTest {
             )
         }
 
-        composeTestRule
-            .onNodeWithContentDescription(
-                context.getString(R.string.contact_item_expand_button_content_description)
-            )
-            .assertDoesNotExist()
+        assertRowClickLabel(contact.displayName, null)
     }
 
     private fun createContactItemWithEmptySelection(contact: Contact) {
@@ -972,6 +1076,18 @@ class ContactItemTest {
                 onToggleEntrySelection = { _, _ -> },
             )
         }
+    }
+
+    /** Helper function to assert that the TalkBack click label on the Row is set correctly. */
+    private fun assertRowClickLabel(displayName: String, expectedLabel: String?) {
+        composeTestRule
+            .onNodeWithText(displayName)
+            .assert(
+                SemanticsMatcher("Click label matches '$expectedLabel'") { node ->
+                    val action = node.config.getOrNull(SemanticsActions.OnClick)
+                    action?.label == expectedLabel
+                }
+            )
     }
 
     /**

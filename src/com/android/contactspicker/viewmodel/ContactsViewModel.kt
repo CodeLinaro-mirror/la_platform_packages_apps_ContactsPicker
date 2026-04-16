@@ -31,6 +31,7 @@ import com.android.contactspicker.ContactsListState
 import com.android.contactspicker.ContactsPreviewState
 import com.android.contactspicker.ContactsUiState
 import com.android.contactspicker.Flags
+import com.android.contactspicker.PrivacyDetailsState
 import com.android.contactspicker.R
 import com.android.contactspicker.SearchState
 import com.android.contactspicker.config.ContactsPickerAction
@@ -44,6 +45,7 @@ import com.android.contactspicker.data.model.PickerUserState
 import com.android.contactspicker.data.model.ProfileBlockedDialogData
 import com.android.contactspicker.data.model.SelectionSource
 import com.android.contactspicker.data.model.UserProfile
+import com.android.contactspicker.data.model.UserType
 import com.android.contactspicker.data.model.emptyContactsSelection
 import com.android.contactspicker.data.repository.ContactsPickerSessionProviderRepository
 import com.android.contactspicker.data.repository.ContactsRepository
@@ -136,12 +138,13 @@ constructor(
     private var selectionCollectorJob: Job? = null
     private var userStateCollectorJob: Job? = null
 
+    private var contactsGrouper: ContactsGrouper? = null
     private var initialContacts: List<Contact> = emptyList()
     private var callingAppName: String? = null
     private var callingPackageName: String? = null
     private var searchJob: Job? = null
     private var loadContactsJob: Job? = null
-    private var cachedStateBeforePreview: ContactsUiState? = null
+    private var cachedStateBeforeNavigation: ContactsUiState? = null
     private var callingAppUid: Int = -1
     private val callingUserId: Int
         get() = UserHandle.getUserId(callingAppUid)
@@ -312,6 +315,7 @@ constructor(
         config: ContactsPickerRequestConfig,
         userState: PickerUserState.Success,
     ) {
+        contactsPickerLogger.allContactsLoadingStarted()
         loadContactsJob?.cancel()
         loadContactsJob =
             viewModelScope.launch {
@@ -320,8 +324,16 @@ constructor(
                     Trace.beginSection("$TAG#loadContactsListData")
                     // load contacts data
                     Trace.beginSection("$TAG#contactsRepository.getContacts")
-                    initialContacts =
+                    val (loadedContacts, initialContactGroupingMetadata) =
                         contactsRepository.getContacts(config.queryMode, userState.selectedUserId)
+                    initialContacts = loadedContacts
+
+                    val availableContactsGroups =
+                        ContactsGrouper(initialContacts, initialContactGroupingMetadata)
+                            .also { contactsGrouper = it }
+                            .availableContactsGroups
+
+                    contactsPickerLogger.allContactsLoadingFinished()
                     Trace.endSection()
                     if (initialContacts.isNotEmpty()) {
                         // Only show the privacy banner if user hasn't seen it before for this
@@ -334,7 +346,7 @@ constructor(
 
                         _uiState.value =
                             ContactsListState.Success(
-                                availableContacts = initialContacts,
+                                availableContactsGroups = availableContactsGroups,
                                 selectedContacts =
                                     checkNotNull(selectionHandler).selectedContacts.value,
                                 isMultiSelectEnabled = config.isMultiSelectEnabled,
@@ -541,25 +553,22 @@ constructor(
     }
 
     private fun showProfilePausedDialog(userProfile: UserProfile, reason: PausedReason? = null) {
+        val dialogData = createProfilePausedDialogData(userProfile, reason)
         _userState.update { currentState ->
             if (currentState is PickerUserState.Success) {
-                currentState.copy(
-                    profileBlockedDialogData = createProfilePausedDialogData(userProfile, reason)
-                )
+                currentState.copy(profileBlockedDialogData = dialogData)
             } else {
                 currentState
             }
         }
     }
 
-    // TODO(b/479461249): Refactor profile visibility logic to use explicit quiet mode properties
     private fun createProfilePausedDialogData(
         userProfile: UserProfile,
         reason: PausedReason? = null,
-    ): ProfileBlockedDialogData {
-        val targetUserLabel = userProfile.switchableInfo?.label ?: ""
-        val actualReason = reason ?: userProfile.pausedInfo?.pausedReason ?: PausedReason.UNDEFINED
-
+    ): ProfileBlockedDialogData? {
+        val actualReason =
+            reason ?: userProfile.pausedInfo?.pausedReason ?: PausedReason.UNKNOWN_REASON
         return when (actualReason) {
             PausedReason.MANAGED_PROFILE_CONTACTS_BLOCKED ->
                 ProfileBlockedDialogData(
@@ -567,28 +576,15 @@ constructor(
                     message = context.getString(R.string.picker_profile_blocked_admin_msg),
                 )
             PausedReason.QUIET_MODE ->
-                ProfileBlockedDialogData(
-                    title =
-                        context.getString(R.string.picker_profile_paused_title, targetUserLabel),
-                    message =
-                        context.getString(
-                            R.string.picker_profile_paused_msg,
-                            targetUserLabel,
-                            targetUserLabel,
-                        ),
-                )
-            PausedReason.UNDEFINED ->
-                // Fallback to generic paused message
-                ProfileBlockedDialogData(
-                    title =
-                        context.getString(R.string.picker_profile_paused_title, targetUserLabel),
-                    message =
-                        context.getString(
-                            R.string.picker_profile_paused_msg,
-                            targetUserLabel,
-                            targetUserLabel,
-                        ),
-                )
+                if (userProfile.userType == UserType.WORK) {
+                    ProfileBlockedDialogData(
+                        title = context.getString(R.string.picker_work_profile_paused_title),
+                        message = context.getString(R.string.picker_work_profile_paused_msg),
+                    )
+                } else {
+                    null
+                }
+            PausedReason.UNKNOWN_REASON -> null
         }
     }
 
@@ -688,8 +684,9 @@ constructor(
                         else ->
                             emptyContactsSelection() // Should not happen if exiting from Success
                     }
+                val availableContactsGroups = checkNotNull(contactsGrouper).availableContactsGroups
                 ContactsListState.Success(
-                    availableContacts = initialContacts,
+                    availableContactsGroups = availableContactsGroups,
                     selectedContacts = selectedContacts,
                     isMultiSelectEnabled = config.isMultiSelectEnabled,
                     callingAppName = callingAppName,
@@ -709,13 +706,13 @@ constructor(
             "onPreviewClicked called from unexpected state: $currentState"
         }
 
-        cachedStateBeforePreview = currentState
+        cachedStateBeforeNavigation = currentState
 
         val (availableContacts, selectedIds, isMultiSelectEnabled) =
             when (currentState) {
                 is ContactsListState.Success ->
                     Triple(
-                        currentState.availableContacts,
+                        initialContacts,
                         currentState.selectedContacts,
                         currentState.isMultiSelectEnabled,
                     )
@@ -746,7 +743,7 @@ constructor(
 
     fun onBackFromPreview() {
         val currentState = _uiState.value
-        val currentCachedState = cachedStateBeforePreview
+        val currentCachedState = cachedStateBeforeNavigation
         require(currentState is ContactsPreviewState && currentCachedState != null) {
             "onBackFromPreview called from unexpected state: $currentState, or no previous state found"
         }
@@ -759,7 +756,34 @@ constructor(
                     currentCachedState.copy(selectedContacts = currentState.selectedContacts)
                 else -> currentCachedState
             }
-        cachedStateBeforePreview = null
+        cachedStateBeforeNavigation = null
+    }
+
+    @OpenForTesting
+    open fun onPrivacyDetailsClicked() {
+        val currentState = _uiState.value
+        require(currentState is ContactsListState.Success) {
+            "onPrivacyDetailsClicked called from unexpected state: $currentState"
+        }
+
+        cachedStateBeforeNavigation = currentState
+
+        _uiState.value =
+            PrivacyDetailsState(
+                callingAppName = currentState.callingAppName,
+                requestedMimeTypes = currentState.requestedMimeTypes,
+            )
+    }
+
+    @OpenForTesting
+    open fun onBackFromPrivacyDetails() {
+        val currentState = _uiState.value
+        val currentCachedState = cachedStateBeforeNavigation
+        require(currentState is PrivacyDetailsState && currentCachedState != null) {
+            "onBackFromPrivacyDetails called from unexpected state: $currentState, or no previous state found"
+        }
+        _uiState.value = currentCachedState
+        cachedStateBeforeNavigation = null
     }
 }
 
