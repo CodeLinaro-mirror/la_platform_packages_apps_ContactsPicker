@@ -19,17 +19,21 @@ import com.android.contactspicker.config.ContactsQueryMode
 import com.android.contactspicker.data.model.Contact
 import com.android.contactspicker.data.model.MimeType
 import com.android.contactspicker.data.repository.ContactsRepository
+import com.android.contactspicker.viewmodel.ContactGroupingMetadata
+import com.android.contactspicker.viewmodel.GroupedContactsData
 
 /** A fake implementation of ContactsRepository for use in tests. */
 class FakeContactsRepository : ContactsRepository {
 
     private var initialContacts: List<Contact> = emptyList()
+    private var initialContactGroupingMetadata = ContactGroupingMetadata.EMPTY
     private var exceptionToThrow: Exception? = null
     private val searchResultsMap = mutableMapOf<String, List<Contact>>()
     private val searchExceptionMap = mutableMapOf<String, Exception>()
     private val searchInvocationsCountMap = mutableMapOf<String, Int>()
     private val dataRowIdsMap = mutableMapOf<Pair<Set<Long>, Set<MimeType>>, List<Long>>()
     private var getContactsInvocationsCount = 0
+    private var hasAnyContacts = true
 
     var lastGetDataRowIdsUserId: Int? = null
         private set
@@ -37,8 +41,12 @@ class FakeContactsRepository : ContactsRepository {
     var lastSearchContactsUserId: Int? = null
         private set
 
-    fun setInitialContacts(contacts: List<Contact>) {
+    fun setInitialContacts(
+        contacts: List<Contact>,
+        metadata: ContactGroupingMetadata = ContactGroupingMetadata.EMPTY,
+    ) {
         initialContacts = contacts
+        initialContactGroupingMetadata = metadata
         exceptionToThrow = null
     }
 
@@ -64,6 +72,10 @@ class FakeContactsRepository : ContactsRepository {
         dataRowIdsMap[contactIds.toSet() to mimeTypes.toSet()] = dataIds
     }
 
+    fun setHasAnyContacts(value: Boolean) {
+        hasAnyContacts = value
+    }
+
     /** Returns the number of times [searchContacts] has been invoked with the provided [query]. */
     fun searchInvocationsCountForQuery(query: String): Int {
         return searchInvocationsCountMap.getOrDefault(query, 0)
@@ -73,10 +85,13 @@ class FakeContactsRepository : ContactsRepository {
         return getContactsInvocationsCount
     }
 
-    override suspend fun getContacts(queryMode: ContactsQueryMode, userId: Int): List<Contact> {
+    override suspend fun getContacts(
+        queryMode: ContactsQueryMode,
+        userId: Int,
+    ): GroupedContactsData {
         getContactsInvocationsCount++
         exceptionToThrow?.let { throw it }
-        return initialContacts
+        return GroupedContactsData(initialContacts, initialContactGroupingMetadata)
     }
 
     override suspend fun searchContacts(
@@ -98,4 +113,7 @@ class FakeContactsRepository : ContactsRepository {
         lastGetDataRowIdsUserId = userId
         return dataRowIdsMap[contactIds.toSet() to mimeTypes.toSet()] ?: emptyList()
     }
+
+    override suspend fun hasAnyContacts(userId: Int): Boolean =
+        if (initialContacts.isNotEmpty()) true else hasAnyContacts
 }

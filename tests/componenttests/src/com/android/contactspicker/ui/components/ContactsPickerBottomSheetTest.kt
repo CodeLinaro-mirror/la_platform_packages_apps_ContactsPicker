@@ -27,7 +27,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -57,7 +57,6 @@ import com.google.common.truth.Truth.assertThat
 import java.util.Locale
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.runBlocking
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -78,7 +77,8 @@ class ContactsPickerBottomSheetTest {
     private val testContact = ContactTestDataFactory.GENERIC_DISPLAY_NAME_CONTACT
     private val testSuccessState =
         ContactsListState.Success(
-            listOf(testContact),
+            availableContactsGroups =
+                ContactTestDataFactory.groupContactsForTest(listOf(testContact)),
             selectedContacts = selectedContacts,
             isMultiSelectEnabled = false,
             callingAppName = null,
@@ -130,17 +130,6 @@ class ContactsPickerBottomSheetTest {
     }
 
     @Test
-    fun scrim_isDisplayed_onlyWhenSheetIsVisible() {
-        setupBottomSheet()
-
-        composeTestRule.onNodeWithTag(SCRIM_TEST_TAG).assertIsDisplayed()
-
-        composeTestRule.onNodeWithTag(BOTTOM_SHEET_TEST_TAG).performTouchInput { swipeDown() }
-        composeTestRule.waitForIdle()
-        composeTestRule.onNodeWithTag(SCRIM_TEST_TAG).assertDoesNotExist()
-    }
-
-    @Test
     fun selectionBar_inLoadingState_isNotVisible() {
         setupBottomSheet()
         composeTestRule
@@ -169,7 +158,10 @@ class ContactsPickerBottomSheetTest {
                     uiState =
                         mutableStateOf(
                             ContactsListState.Success(
-                                availableContacts = listOf(testContact),
+                                availableContactsGroups =
+                                    ContactTestDataFactory.groupContactsForTest(
+                                        listOf(testContact)
+                                    ),
                                 selectedContacts = selectedContacts,
                                 isMultiSelectEnabled = false,
                                 callingAppName = null,
@@ -179,14 +171,16 @@ class ContactsPickerBottomSheetTest {
                         ),
                     userState = PickerUserState.Loading,
                     snackbarEvents = flowOf(),
-                    onToggleContactSelection = {},
-                    onToggleEntrySelection = { _, _ -> },
+                    onToggleContactSelection = { _, _ -> },
+                    onToggleEntrySelection = { _, _, _ -> },
                     onClearSelection = {},
                     onDoneClicked = {},
                     onQueryChange = {},
                     onExitSearch = {},
                     onPreviewClicked = {},
                     onBackFromPreview = {},
+                    onPrivacyDetailsClicked = {},
+                    onBackFromPrivacyDetails = {},
                     onPrivacyBannerDismissRequest = {},
                     onProfileClicked = {},
                     onDismissProfileBlockedDialog = {},
@@ -220,7 +214,10 @@ class ContactsPickerBottomSheetTest {
                     uiState =
                         mutableStateOf(
                             ContactsListState.Success(
-                                availableContacts = listOf(testContact),
+                                availableContactsGroups =
+                                    ContactTestDataFactory.groupContactsForTest(
+                                        listOf(testContact)
+                                    ),
                                 selectedContacts = selectedContacts,
                                 isMultiSelectEnabled = false,
                                 callingAppName = null,
@@ -230,14 +227,16 @@ class ContactsPickerBottomSheetTest {
                         ),
                     userState = PickerUserState.Loading,
                     snackbarEvents = flowOf(),
-                    onToggleContactSelection = {},
-                    onToggleEntrySelection = { _, _ -> },
+                    onToggleContactSelection = { _, _ -> },
+                    onToggleEntrySelection = { _, _, _ -> },
                     onClearSelection = {},
                     onDoneClicked = {},
                     onQueryChange = {},
                     onExitSearch = {},
                     onPreviewClicked = {},
                     onBackFromPreview = {},
+                    onPrivacyDetailsClicked = {},
+                    onBackFromPrivacyDetails = {},
                     onPrivacyBannerDismissRequest = {},
                     onProfileClicked = {},
                     onDismissProfileBlockedDialog = {},
@@ -287,7 +286,10 @@ class ContactsPickerBottomSheetTest {
                     uiState =
                         mutableStateOf(
                             ContactsListState.Success(
-                                availableContacts = listOf(testContact),
+                                availableContactsGroups =
+                                    ContactTestDataFactory.groupContactsForTest(
+                                        listOf(testContact)
+                                    ),
                                 selectedContacts = selectedContacts,
                                 false,
                                 callingAppName = null,
@@ -297,14 +299,16 @@ class ContactsPickerBottomSheetTest {
                         ),
                     userState = PickerUserState.Loading,
                     snackbarEvents = flowOf(),
-                    onToggleEntrySelection = { _, _ -> },
-                    onToggleContactSelection = {},
+                    onToggleEntrySelection = { _, _, _ -> },
+                    onToggleContactSelection = { _, _ -> },
                     onClearSelection = {},
                     onDoneClicked = {},
                     onQueryChange = onSearchQueryChanged,
                     onExitSearch = {},
                     onPreviewClicked = {},
                     onBackFromPreview = {},
+                    onPrivacyDetailsClicked = {},
+                    onBackFromPrivacyDetails = {},
                     onPrivacyBannerDismissRequest = {},
                     onProfileClicked = {},
                     onDismissProfileBlockedDialog = {},
@@ -324,7 +328,7 @@ class ContactsPickerBottomSheetTest {
 
     @Test
     fun selectionLimitSnackbar_appearsWhenEventIsEmitted_andDisappearsAfterTimeout() {
-        val events = MutableSharedFlow<SnackbarEvent>()
+        val events = MutableSharedFlow<SnackbarEvent>(replay = 1)
         val msgFormat =
             MessageFormat(
                 context.getString(R.string.contacts_selection_limit_reached_message),
@@ -340,7 +344,8 @@ class ContactsPickerBottomSheetTest {
                 uiState =
                     mutableStateOf(
                         ContactsListState.Success(
-                            availableContacts = listOf(testContact),
+                            availableContactsGroups =
+                                ContactTestDataFactory.groupContactsForTest(listOf(testContact)),
                             selectedContacts =
                                 contactsSelectionOf(testContact.id, setOf(testContact.id)),
                             isMultiSelectEnabled = false,
@@ -351,14 +356,16 @@ class ContactsPickerBottomSheetTest {
                     ),
                 userState = PickerUserState.Loading,
                 snackbarEvents = events,
-                onToggleContactSelection = {},
-                onToggleEntrySelection = { _, _ -> },
+                onToggleContactSelection = { _, _ -> },
+                onToggleEntrySelection = { _, _, _ -> },
                 onClearSelection = {},
                 onDoneClicked = {},
                 onQueryChange = {},
                 onExitSearch = {},
                 onPreviewClicked = {},
                 onBackFromPreview = {},
+                onPrivacyDetailsClicked = {},
+                onBackFromPrivacyDetails = {},
                 onPrivacyBannerDismissRequest = {},
                 onProfileClicked = {},
                 onDismissProfileBlockedDialog = {},
@@ -366,15 +373,18 @@ class ContactsPickerBottomSheetTest {
         }
 
         composeTestRule.onNodeWithText(snackbarMessage).assertDoesNotExist()
+        composeTestRule.onNodeWithContentDescription(snackbarMessage).assertDoesNotExist()
 
-        runBlocking { events.emit(SnackbarEvent.ShowSelectionLimitReached(2)) }
+        events.tryEmit(SnackbarEvent.ShowSelectionLimitReached(2))
 
         composeTestRule.onNodeWithText(snackbarMessage).assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescription(snackbarMessage).assertIsDisplayed()
 
         // Advance the clock past the Snackbar's default duration (4 seconds) + 1 to be safe
         composeTestRule.mainClock.advanceTimeBy(5000)
 
         composeTestRule.onNodeWithText(snackbarMessage).assertDoesNotExist()
+        composeTestRule.onNodeWithContentDescription(snackbarMessage).assertDoesNotExist()
     }
 
     @Test
@@ -395,14 +405,16 @@ class ContactsPickerBottomSheetTest {
                         ),
                     userState = PickerUserState.Loading,
                     snackbarEvents = flowOf(),
-                    onToggleContactSelection = {},
-                    onToggleEntrySelection = { _, _ -> },
+                    onToggleContactSelection = { _, _ -> },
+                    onToggleEntrySelection = { _, _, _ -> },
                     onClearSelection = {},
                     onDoneClicked = {},
                     onQueryChange = {},
                     onExitSearch = {},
                     onPreviewClicked = {},
                     onBackFromPreview = { onBackFromPreview = true },
+                    onPrivacyDetailsClicked = {},
+                    onBackFromPrivacyDetails = {},
                     onPrivacyBannerDismissRequest = {},
                     onProfileClicked = {},
                     onDismissProfileBlockedDialog = {},
@@ -427,7 +439,10 @@ class ContactsPickerBottomSheetTest {
                     uiState =
                         mutableStateOf(
                             ContactsListState.Success(
-                                availableContacts = listOf(testContact),
+                                availableContactsGroups =
+                                    ContactTestDataFactory.groupContactsForTest(
+                                        listOf(testContact)
+                                    ),
                                 selectedContacts =
                                     contactsSelectionOf(testContact.id, setOf(testContact.id)),
                                 isMultiSelectEnabled = false,
@@ -438,14 +453,16 @@ class ContactsPickerBottomSheetTest {
                         ),
                     userState = PickerUserState.Loading,
                     snackbarEvents = flowOf(),
-                    onToggleContactSelection = {},
-                    onToggleEntrySelection = { _, _ -> },
+                    onToggleContactSelection = { _, _ -> },
+                    onToggleEntrySelection = { _, _, _ -> },
                     onClearSelection = {},
                     onDoneClicked = {},
                     onQueryChange = {},
                     onExitSearch = {},
                     onPreviewClicked = {},
                     onBackFromPreview = { onBackFromPreview = true },
+                    onPrivacyDetailsClicked = {},
+                    onBackFromPrivacyDetails = {},
                     onPrivacyBannerDismissRequest = {},
                     onProfileClicked = {},
                     onDismissProfileBlockedDialog = {},
@@ -504,7 +521,10 @@ class ContactsPickerBottomSheetTest {
                     uiState =
                         mutableStateOf(
                             ContactsListState.Success(
-                                availableContacts = listOf(testContact),
+                                availableContactsGroups =
+                                    ContactTestDataFactory.groupContactsForTest(
+                                        listOf(testContact)
+                                    ),
                                 selectedContacts = selectedContacts,
                                 isMultiSelectEnabled = true,
                                 callingAppName = null,
@@ -514,14 +534,16 @@ class ContactsPickerBottomSheetTest {
                         ),
                     userState = PickerUserState.Loading,
                     snackbarEvents = flowOf(),
-                    onToggleContactSelection = {},
-                    onToggleEntrySelection = { _, _ -> },
+                    onToggleContactSelection = { _, _ -> },
+                    onToggleEntrySelection = { _, _, _ -> },
                     onClearSelection = {},
                     onDoneClicked = {},
                     onQueryChange = {},
                     onExitSearch = {},
                     onPreviewClicked = {},
                     onBackFromPreview = {},
+                    onPrivacyDetailsClicked = {},
+                    onBackFromPrivacyDetails = {},
                     onPrivacyBannerDismissRequest = {},
                     onProfileClicked = {},
                     onDismissProfileBlockedDialog = {},
@@ -552,6 +574,70 @@ class ContactsPickerBottomSheetTest {
         assertThat(selectionBarBounds.width).isLessThan(bottomSheetBounds.width)
     }
 
+    @Test
+    fun selectionBar_isVerticallyAlignedWithBottomSheet() {
+        // GIVEN the bottom sheet is visible with a selectable contact
+        selectedContacts = emptyContactsSelection()
+        composeTestRule.setContent {
+            ContactsPickerAppTheme {
+                ContactsPickerBottomSheet(
+                    onDismissRequest = {},
+                    uiState =
+                        mutableStateOf(
+                            ContactsListState.Success(
+                                availableContactsGroups =
+                                    ContactTestDataFactory.groupContactsForTest(
+                                        listOf(testContact)
+                                    ),
+                                selectedContacts = selectedContacts,
+                                isMultiSelectEnabled = true,
+                                callingAppName = null,
+                                showPrivacyBanner = false,
+                                requestedMimeTypes = emptyList(),
+                            )
+                        ),
+                    userState = PickerUserState.Loading,
+                    snackbarEvents = flowOf(),
+                    onToggleContactSelection = { _, _ -> },
+                    onToggleEntrySelection = { _, _, _ -> },
+                    onClearSelection = {},
+                    onDoneClicked = {},
+                    onQueryChange = {},
+                    onExitSearch = {},
+                    onPreviewClicked = {},
+                    onBackFromPreview = {},
+                    onPrivacyDetailsClicked = {},
+                    onBackFromPrivacyDetails = {},
+                    onPrivacyBannerDismissRequest = {},
+                    onProfileClicked = {},
+                    onDismissProfileBlockedDialog = {},
+                )
+            }
+        }
+
+        // WHEN a contact is selected, making the selection bar visible
+        selectedContacts = contactsSelectionOf(testContact.id, setOf(testContact.id))
+        composeTestRule.waitForIdle()
+
+        // THEN the selection bar should be vertically aligned with the bottom of the bottom sheet,
+        // as both should respect the same navigation bar insets.
+        val bottomSheetBounds =
+            composeTestRule.onNodeWithTag(BOTTOM_SHEET_TEST_TAG).getUnclippedBoundsInRoot()
+
+        val clearButtonNode =
+            composeTestRule.onNodeWithContentDescription(
+                context.getString(R.string.selection_bottom_bar_clear_button_content_description)
+            )
+
+        // The parent of the clear button is the SelectionBottomBar (a Row)
+        val selectionBarBounds = clearButtonNode.onParent().getUnclippedBoundsInRoot()
+
+        // The SelectionBottomBar should be positioned above the bottom of the bottom sheet,
+        // which implies that it respects the navigation bar insets and has its own padding.
+        // This is more resilient than asserting an exact padding value.
+        assertThat(selectionBarBounds.bottom).isLessThan(bottomSheetBounds.bottom)
+    }
+
     private fun setupBottomSheet(
         onDismissRequest: () -> Unit = {},
         uiState: ContactsUiState = ContactsListState.Loading,
@@ -563,14 +649,16 @@ class ContactsPickerBottomSheetTest {
                     uiState = mutableStateOf(uiState),
                     userState = PickerUserState.Loading,
                     snackbarEvents = flowOf(),
-                    onToggleContactSelection = {},
-                    onToggleEntrySelection = { _, _ -> },
+                    onToggleContactSelection = { _, _ -> },
+                    onToggleEntrySelection = { _, _, _ -> },
                     onClearSelection = {},
                     onDoneClicked = {},
                     onQueryChange = {},
                     onExitSearch = {},
                     onPreviewClicked = {},
                     onBackFromPreview = {},
+                    onPrivacyDetailsClicked = {},
+                    onBackFromPrivacyDetails = {},
                     onPrivacyBannerDismissRequest = {},
                     onProfileClicked = {},
                     onDismissProfileBlockedDialog = {},

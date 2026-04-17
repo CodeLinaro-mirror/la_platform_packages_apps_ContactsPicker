@@ -18,6 +18,7 @@ package com.android.contactspicker.ui.pickerscreen
 
 import android.content.Context
 import android.content.flags.Flags
+import android.platform.test.annotations.RequiresFlagsDisabled
 import android.platform.test.annotations.RequiresFlagsEnabled
 import android.platform.test.flag.junit.CheckFlagsRule
 import android.platform.test.flag.junit.DeviceFlagsValueProvider
@@ -30,11 +31,13 @@ import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.hasAnyDescendant
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToIndex
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeUp
@@ -42,6 +45,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.contactspicker.R
 import com.android.contactspicker.data.model.Contact
+import com.android.contactspicker.data.model.SelectionSource
 import com.android.contactspicker.data.model.emptyContactsSelection
 import com.android.contactspicker.testdata.ContactTestDataFactory
 import com.android.contactspicker.ui.components.AVATAR_TEST_TAG
@@ -63,19 +67,27 @@ class ContactsPickerBodyTest {
 
     private val context: Context = ApplicationProvider.getApplicationContext()
 
+    private val EMPTY_ON_TOGGLE_CONTACT_SELECTION_CALLBACK: (Contact, SelectionSource) -> Unit =
+        { _, _ ->
+        }
+    private val EMPTY_ON_TOGGLE_ENTRY_SELECTION_CALLBACK: (Long, Long, SelectionSource) -> Unit =
+        { _, _, _ ->
+        }
+
     @Test
+    @RequiresFlagsDisabled(com.android.contactspicker.Flags.FLAG_ENABLE_CONTACT_GROUPING_USING_CP2)
     fun contactsList_displaysHeadersAndContacts() {
         val contacts = ContactTestDataFactory.GENERIC_DISPLAY_NAME_CONTACT_LIST
 
         composeTestRule.setContent {
             ContactsPickerBody(
-                contacts = contacts,
+                availableContactsGroups = ContactTestDataFactory.groupContactsForTest(contacts),
                 selectedContacts = emptyContactsSelection(),
                 isMultiSelectEnabled = false,
                 onPrivacyBannerMoreDetails = {},
                 onPrivacyBannerDismissRequest = {},
-                onToggleContactSelection = {},
-                onToggleEntrySelection = { _, _ -> },
+                onToggleContactSelection = EMPTY_ON_TOGGLE_CONTACT_SELECTION_CALLBACK,
+                onToggleEntrySelection = EMPTY_ON_TOGGLE_ENTRY_SELECTION_CALLBACK,
                 callingAppName = null,
                 showPrivacyBanner = false,
             )
@@ -103,14 +115,17 @@ class ContactsPickerBodyTest {
     fun privacyBanner_isDisplayed() {
         composeTestRule.setContent {
             ContactsPickerBody(
-                contacts = listOf(ContactTestDataFactory.GENERIC_DISPLAY_NAME_CONTACT),
+                availableContactsGroups =
+                    ContactTestDataFactory.groupContactsForTest(
+                        listOf(ContactTestDataFactory.GENERIC_DISPLAY_NAME_CONTACT)
+                    ),
                 selectedContacts = emptyContactsSelection(),
                 isMultiSelectEnabled = false,
                 onPrivacyBannerMoreDetails = {},
                 onPrivacyBannerDismissRequest = {},
-                onToggleContactSelection = {},
+                onToggleContactSelection = EMPTY_ON_TOGGLE_CONTACT_SELECTION_CALLBACK,
+                onToggleEntrySelection = EMPTY_ON_TOGGLE_ENTRY_SELECTION_CALLBACK,
                 showPrivacyBanner = true,
-                onToggleEntrySelection = { _, _ -> },
                 callingAppName = null,
             )
         }
@@ -121,14 +136,17 @@ class ContactsPickerBodyTest {
     fun privacyBanner_isNotDisplayed() {
         composeTestRule.setContent {
             ContactsPickerBody(
-                contacts = listOf(ContactTestDataFactory.GENERIC_DISPLAY_NAME_CONTACT),
+                availableContactsGroups =
+                    ContactTestDataFactory.groupContactsForTest(
+                        listOf(ContactTestDataFactory.GENERIC_DISPLAY_NAME_CONTACT)
+                    ),
                 selectedContacts = emptyContactsSelection(),
                 isMultiSelectEnabled = false,
                 onPrivacyBannerMoreDetails = {},
                 onPrivacyBannerDismissRequest = {},
-                onToggleContactSelection = {},
+                onToggleContactSelection = EMPTY_ON_TOGGLE_CONTACT_SELECTION_CALLBACK,
+                onToggleEntrySelection = EMPTY_ON_TOGGLE_ENTRY_SELECTION_CALLBACK,
                 showPrivacyBanner = false,
-                onToggleEntrySelection = { _, _ -> },
                 callingAppName = null,
             )
         }
@@ -180,6 +198,7 @@ class ContactsPickerBodyTest {
     }
 
     @Test
+    @RequiresFlagsDisabled(com.android.contactspicker.Flags.FLAG_ENABLE_CONTACT_GROUPING_USING_CP2)
     fun contactsPickerBody_withSpecialCharacterDisplayName_displaysEmojiHeader() {
         val regularContact = ContactTestDataFactory.GENERIC_DISPLAY_NAME_CONTACT
         val contacts =
@@ -230,6 +249,7 @@ class ContactsPickerBodyTest {
     }
 
     @Test
+    @RequiresFlagsDisabled(com.android.contactspicker.Flags.FLAG_ENABLE_CONTACT_GROUPING_USING_CP2)
     fun contactsList_rendersSections_inCorrectOrder() {
         val favContact =
             ContactTestDataFactory.createDisplayNameContact(
@@ -274,13 +294,13 @@ class ContactsPickerBodyTest {
 
         composeTestRule.setContent {
             ContactsPickerBody(
-                contacts = contacts,
+                availableContactsGroups = ContactTestDataFactory.groupContactsForTest(contacts),
                 selectedContacts = selectedContactsState.value,
                 isMultiSelectEnabled = true,
                 onPrivacyBannerMoreDetails = {},
                 onPrivacyBannerDismissRequest = {},
-                onToggleContactSelection = {},
-                onToggleEntrySelection = { _, _ -> },
+                onToggleContactSelection = EMPTY_ON_TOGGLE_CONTACT_SELECTION_CALLBACK,
+                onToggleEntrySelection = EMPTY_ON_TOGGLE_ENTRY_SELECTION_CALLBACK,
                 callingAppName = null,
                 showPrivacyBanner = false,
             )
@@ -409,6 +429,24 @@ class ContactsPickerBodyTest {
     }
 
     @Test
+    fun scrubber_isNotDisplayed_whenManyFavoritesButFewUniqueContacts() {
+        // Create 30 unique contacts, and make all of them favorites.
+        // Total rendered items in UI = 30 (Favorites) + 30 (Main list) = 60.
+        val contacts =
+            (0 until 30).map {
+                ContactTestDataFactory.createDisplayNameContact(
+                    id = it.toLong(),
+                    displayName = "Contact $it",
+                    isFavorite = true,
+                )
+            }
+        setContentWithContactsPickerBody(contacts)
+        // totalContactsCount (excluding Favorites section) = 30.
+        // Since 30 < 50, scrubber should not be displayed.
+        composeTestRule.onNodeWithTag(SCRUBBER_HANDLE_TEST_TAG).assertDoesNotExist()
+    }
+
+    @Test
     fun scrubber_isNotDisplayed_whenContactsAreLessThanMinimum() {
         val contacts =
             ContactTestDataFactory.createContactList(MIN_CONTACTS_COUNT_FOR_SCRUBBER_ACTIVATION - 1)
@@ -425,17 +463,125 @@ class ContactsPickerBodyTest {
         composeTestRule.onNodeWithTag(SCRUBBER_HANDLE_TEST_TAG).assertIsDisplayed()
     }
 
+    @Test
+    fun onToggleContactSelection_fromList_passesListSource() {
+        var toggledSource: SelectionSource? = null
+        val contact = ContactTestDataFactory.GENERIC_DISPLAY_NAME_CONTACT
+
+        composeTestRule.setContent {
+            ContactsPickerBody(
+                availableContactsGroups =
+                    ContactTestDataFactory.groupContactsForTest(listOf(contact)),
+                selectedContacts = emptyContactsSelection(),
+                isMultiSelectEnabled = false,
+                onPrivacyBannerMoreDetails = {},
+                onPrivacyBannerDismissRequest = {},
+                onToggleContactSelection = { _, source -> toggledSource = source },
+                onToggleEntrySelection = { _, _, _ -> },
+                callingAppName = null,
+                showPrivacyBanner = false,
+            )
+        }
+
+        composeTestRule.onNodeWithText(contact.displayName).performClick()
+
+        assertThat(toggledSource).isEqualTo(SelectionSource.MAIN_LIST)
+    }
+
+    @Test
+    fun onToggleContactSelection_fromFavorites_passesFavoritesSource() {
+        var toggledSource: SelectionSource? = null
+        // Create or copy a contact that is explicitly marked as a favorite
+        val favoriteContact =
+            ContactTestDataFactory.createDisplayNameContact(
+                id = 123L,
+                displayName = "Favorite Person",
+                isFavorite = true,
+            )
+
+        composeTestRule.setContent {
+            ContactsPickerBody(
+                availableContactsGroups =
+                    ContactTestDataFactory.groupContactsForTest(listOf(favoriteContact)),
+                selectedContacts = emptyContactsSelection(),
+                isMultiSelectEnabled = false,
+                onPrivacyBannerMoreDetails = {},
+                onPrivacyBannerDismissRequest = {},
+                onToggleContactSelection = { _, source -> toggledSource = source },
+                onToggleEntrySelection = { _, _, _ -> },
+                callingAppName = null,
+                showPrivacyBanner = false,
+            )
+        }
+
+        // Click the first instance of the contact, which will be in the favorites section
+        composeTestRule.onAllNodesWithText(favoriteContact.displayName).onFirst().performClick()
+
+        assertThat(toggledSource).isEqualTo(SelectionSource.FAVORITES)
+    }
+
+    @Test
+    fun contactsList_whenSelectionChanges_doesNotScroll() {
+        val contacts = ContactTestDataFactory.createContactList(20)
+        val selectedContactsState = mutableStateOf(emptyContactsSelection())
+
+        composeTestRule.setContent {
+            ContactsPickerBody(
+                availableContactsGroups = ContactTestDataFactory.groupContactsForTest(contacts),
+                selectedContacts = selectedContactsState.value,
+                isMultiSelectEnabled = true,
+                onPrivacyBannerMoreDetails = {},
+                onPrivacyBannerDismissRequest = {},
+                onToggleContactSelection = { _, _ -> },
+                onToggleEntrySelection = { _, _, _ -> },
+                callingAppName = null,
+                showPrivacyBanner = false,
+            )
+        }
+
+        val listNode = composeTestRule.onNode(hasTestTag(CONTACTS_LIST_TEST_TAG))
+
+        // scroll down from the top
+        listNode.performScrollToIndex(5)
+        composeTestRule.waitForIdle()
+
+        // capture the exact screen position of a visible item
+        val visibleContactName = contacts[5].displayName
+        val itemBoundsBefore =
+            composeTestRule.onNodeWithText(visibleContactName).fetchSemanticsNode().boundsInRoot
+
+        // select a contact to make the selection bar appear
+        val newSelection = MutableLongObjectMap<Set<Long>>()
+        newSelection.put(contacts[6].id, emptySet())
+        selectedContactsState.value = newSelection
+        composeTestRule.waitForIdle()
+
+        // verify the item hasn't moved (the list did not scroll up)
+        val itemBoundsWithSelectionBar =
+            composeTestRule.onNodeWithText(visibleContactName).fetchSemanticsNode().boundsInRoot
+
+        assertThat(itemBoundsWithSelectionBar.top).isEqualTo(itemBoundsBefore.top)
+
+        // same for the selection bar disappearing
+        selectedContactsState.value = MutableLongObjectMap()
+        composeTestRule.waitForIdle()
+        val itemBoundsAfter =
+            composeTestRule.onNodeWithText(visibleContactName).fetchSemanticsNode().boundsInRoot
+
+        assertThat(itemBoundsAfter.top).isEqualTo(itemBoundsBefore.top)
+    }
+
     private fun setContentWithContactsPickerBody(contacts: List<Contact>) {
         composeTestRule.setContent {
             ContactsPickerBody(
-                contacts = contacts,
+                availableContactsGroups = ContactTestDataFactory.groupContactsForTest(contacts),
                 onPrivacyBannerMoreDetails = {},
                 onPrivacyBannerDismissRequest = {},
                 selectedContacts = emptyContactsSelection(),
                 isMultiSelectEnabled = false,
                 showPrivacyBanner = true,
-                onToggleContactSelection = {},
-                onToggleEntrySelection = { _, _ -> },
+                onToggleContactSelection = EMPTY_ON_TOGGLE_CONTACT_SELECTION_CALLBACK,
+                onToggleEntrySelection = EMPTY_ON_TOGGLE_ENTRY_SELECTION_CALLBACK,
                 callingAppName = null,
             )
         }

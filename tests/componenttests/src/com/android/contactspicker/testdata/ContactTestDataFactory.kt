@@ -16,12 +16,16 @@
 
 package com.android.contactspicker.testdata
 
+import android.provider.ContactsContract
 import com.android.contactspicker.data.model.Contact
 import com.android.contactspicker.data.model.DisplayNameContact
 import com.android.contactspicker.data.model.EmailContact
 import com.android.contactspicker.data.model.EmailEntry
 import com.android.contactspicker.data.model.PhoneContact
 import com.android.contactspicker.data.model.PhoneEntry
+import com.android.contactspicker.data.model.SectionKey
+import com.android.contactspicker.viewmodel.ContactGroupingMetadata
+import com.android.contactspicker.viewmodel.ContactsGrouper
 
 /** A central factory for creating test [Contact] objects for tests. */
 object ContactTestDataFactory {
@@ -64,6 +68,7 @@ object ContactTestDataFactory {
         return DisplayNameContact(
             id = id,
             displayName = displayName,
+            displayNameSource = ContactsContract.DisplayNameSources.STRUCTURED_NAME,
             isFavorite = isFavorite,
             profilePictureUri = profilePictureUri,
             lookupKey = lookupKey,
@@ -81,6 +86,7 @@ object ContactTestDataFactory {
         return PhoneContact(
             id = id,
             displayName = displayName,
+            displayNameSource = ContactsContract.DisplayNameSources.STRUCTURED_NAME,
             isFavorite = isFavorite,
             phones = phones,
             profilePictureUri = profilePictureUri,
@@ -98,6 +104,7 @@ object ContactTestDataFactory {
         return EmailContact(
             id = id,
             displayName = displayName,
+            displayNameSource = ContactsContract.DisplayNameSources.STRUCTURED_NAME,
             isFavorite = isFavorite,
             emails = emails,
             profilePictureUri = profilePictureUri,
@@ -158,5 +165,12 @@ object ContactTestDataFactory {
             val id = (it + 1).toLong()
             createDisplayNameContact(id = id, displayName = "$namePrefix $id")
         }
+    }
+
+    fun groupContactsForTest(
+        contacts: List<Contact>,
+        metadata: ContactGroupingMetadata = ContactGroupingMetadata.EMPTY,
+    ): Map<SectionKey, List<Contact>> {
+        return ContactsGrouper(contacts, metadata).availableContactsGroups
     }
 }

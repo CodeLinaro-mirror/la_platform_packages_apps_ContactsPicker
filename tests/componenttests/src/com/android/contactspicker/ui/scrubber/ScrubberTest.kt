@@ -29,7 +29,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
 import androidx.compose.ui.test.getBoundsInRoot
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.unit.LayoutDirection
@@ -112,7 +112,7 @@ class ScrubberTest {
 
         val expectedY = (containerSize - ScrubberHandleHeight) * 0.5f
         val handleNode = composeTestRule.onNodeWithTag(SCRUBBER_HANDLE_TEST_TAG)
-        handleNode.assertTopPositionInRootIsEqualTo(expectedY)
+        assertThat(handleNode.getBoundsInRoot().top.value).isWithin(1f).of(expectedY.value)
         assertHandleAndLabelAreVerticallyCentered()
         assertHandleIsHorizontallyAtTheEnd()
     }

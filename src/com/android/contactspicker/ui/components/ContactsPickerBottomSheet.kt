@@ -19,7 +19,6 @@ import android.icu.text.MessageFormat
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
@@ -62,10 +61,10 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
 import com.android.contactspicker.ContactsListState
 import com.android.contactspicker.ContactsPreviewState
 import com.android.contactspicker.ContactsUiState
@@ -73,9 +72,10 @@ import com.android.contactspicker.R
 import com.android.contactspicker.SearchState
 import com.android.contactspicker.data.model.Contact
 import com.android.contactspicker.data.model.PickerUserState
+import com.android.contactspicker.data.model.SelectionSource
 import com.android.contactspicker.data.model.UserProfile
 import com.android.contactspicker.data.model.totalElementCount
-import com.android.contactspicker.navigation.ContactsPickerNavHost
+import com.android.contactspicker.ui.pickerscreen.ContactsPickerScreen
 import com.android.contactspicker.ui.pickerscreen.SelectionBottomBar
 import com.android.contactspicker.viewmodel.SnackbarEvent
 import java.util.Locale
@@ -84,10 +84,9 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 internal const val BOTTOM_SHEET_TEST_TAG = "bottom_sheet"
-internal const val SCRIM_TEST_TAG = "scrim"
 
 internal const val BOTTOM_SHEET_PEEK_HEIGHT_RATIO = 0.75f
-private const val SCRIM_ALPHA = 0.32f
+internal val SELECTION_BAR_ABOVE_NAV_BAR_PADDING = 8.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -96,9 +95,11 @@ fun ContactsPickerBottomSheet(
     uiState: State<ContactsUiState>,
     userState: PickerUserState,
     snackbarEvents: Flow<SnackbarEvent>,
-    onToggleContactSelection: (Contact) -> Unit,
-    onToggleEntrySelection: (Long, Long) -> Unit,
+    onToggleContactSelection: (Contact, SelectionSource) -> Unit,
+    onToggleEntrySelection: (Long, Long, SelectionSource) -> Unit,
     onClearSelection: () -> Unit,
+    onPrivacyDetailsClicked: () -> Unit,
+    onBackFromPrivacyDetails: () -> Unit,
     onPrivacyBannerDismissRequest: () -> Unit,
     bottomSheetState: SheetState =
         rememberStandardBottomSheetState(
@@ -114,14 +115,10 @@ fun ContactsPickerBottomSheet(
     onDismissProfileBlockedDialog: () -> Unit,
 ) {
     val peekHeight = LocalConfiguration.current.screenHeightDp.dp * BOTTOM_SHEET_PEEK_HEIGHT_RATIO
-    val navController = rememberNavController()
     val scaffoldState = rememberBottomSheetScaffoldState(bottomSheetState = bottomSheetState)
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
-
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route
 
     LaunchedEffect(bottomSheetState.currentValue) {
         if (bottomSheetState.currentValue == SheetValue.Hidden) {
@@ -149,15 +146,6 @@ fun ContactsPickerBottomSheet(
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // Draw a scrim behind the scaffold when the sheet is not hidden
-        if (bottomSheetState.currentValue != SheetValue.Hidden) {
-            Box(
-                modifier =
-                    Modifier.fillMaxSize()
-                        .background(MaterialTheme.colorScheme.scrim.copy(alpha = SCRIM_ALPHA))
-                        .testTag(SCRIM_TEST_TAG)
-            )
-        }
         val sheetOffsetLeft = remember { mutableFloatStateOf(0f) }
         val sheetWidth = remember { mutableFloatStateOf(0f) }
         BottomSheetScaffold(
@@ -174,20 +162,21 @@ fun ContactsPickerBottomSheet(
             sheetShadowElevation = 8.dp,
             containerColor = Color.Transparent,
             sheetContent = {
-                ContactsPickerNavHost(
-                    navController = navController,
-                    uiState = uiState,
-                    userState = userState,
-                    onToggleContactSelection = onToggleContactSelection,
-                    onToggleEntrySelection = onToggleEntrySelection,
-                    onPrivacyBannerDismissRequest = onPrivacyBannerDismissRequest,
-                    onExpandRequest = { scope.launch { bottomSheetState.expand() } },
+                ContactsPickerScreen(
                     modifier =
                         Modifier.testTag(BOTTOM_SHEET_TEST_TAG).onGloballyPositioned {
                             val bounds = it.boundsInWindow()
                             sheetWidth.value = bounds.width
                             sheetOffsetLeft.value = bounds.left
                         },
+                    uiState = uiState,
+                    userState = userState,
+                    onToggleContactSelection = onToggleContactSelection,
+                    onToggleEntrySelection = onToggleEntrySelection,
+                    onPrivacyDetailsClicked = onPrivacyDetailsClicked,
+                    onBackFromPrivacyDetails = onBackFromPrivacyDetails,
+                    onPrivacyBannerDismissRequest = onPrivacyBannerDismissRequest,
+                    onExpandRequest = { scope.launch { bottomSheetState.expand() } },
                     onQueryChange = onQueryChange,
                     onExitSearch = onExitSearch,
                     onBackFromPreview = onBackFromPreview,
@@ -216,7 +205,10 @@ fun ContactsPickerBottomSheet(
                 ) {
                     Text(
                         text = data.visuals.message,
-                        modifier = Modifier.padding(vertical = 16.dp, horizontal = 22.dp),
+                        modifier =
+                            Modifier.padding(vertical = 16.dp, horizontal = 22.dp).semantics {
+                                contentDescription = data.visuals.message
+                            },
                         style = MaterialTheme.typography.bodyMedium,
                     )
                 }
@@ -246,12 +238,21 @@ private fun AnimatedSelectionBottomBar(
     val isPreviewMode = uiStateValue is ContactsPreviewState
 
     val density = LocalDensity.current
-    val navBarHeight = WindowInsets.navigationBars.getBottom(density)
+    val navBarHeightPx = WindowInsets.navigationBars.getBottom(density)
+    val spatialExpressiveSpec = MaterialTheme.motionScheme.defaultSpatialSpec<IntOffset>()
 
     AnimatedVisibility(
         visible = uiStateValue.isSelectionBarVisible(),
-        enter = slideInVertically(initialOffsetY = { it + navBarHeight }),
-        exit = slideOutVertically(targetOffsetY = { it + navBarHeight }),
+        enter =
+            slideInVertically(
+                initialOffsetY = { it + navBarHeightPx },
+                animationSpec = spatialExpressiveSpec,
+            ),
+        exit =
+            slideOutVertically(
+                targetOffsetY = { it + navBarHeightPx },
+                animationSpec = spatialExpressiveSpec,
+            ),
         modifier = modifier.padding(horizontal = 16.dp),
     ) {
         SelectionBottomBar(
@@ -266,7 +267,7 @@ private fun AnimatedSelectionBottomBar(
                 }
                 onClearSelection()
             },
-            modifier = Modifier.padding(bottom = 24.dp),
+            modifier = Modifier.padding(bottom = SELECTION_BAR_ABOVE_NAV_BAR_PADDING),
         )
     }
 }

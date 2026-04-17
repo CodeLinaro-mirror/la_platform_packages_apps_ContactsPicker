@@ -66,7 +66,11 @@ constructor(
                     val currentSelected = _selectedUserId.value
                     if (currentSelected != null) {
                         val profile = availableUsersMap[currentSelected]
-                        if (profile == null || profile.pausedInfo != null) {
+                        if (
+                            profile == null ||
+                                profile.pausedInfo != null ||
+                                profile.switchableInfo == null
+                        ) {
                             _selectedUserId.value = null
                         }
                     }
@@ -90,9 +94,11 @@ constructor(
         val currentProcessUserId = UserHandle.myUserId()
         val allProfiles = userManager.getProfiles(currentProcessUserId)
 
-        return allProfiles.associate { userInfo ->
-            userInfo.id to userProfileFactory.createProfile(userInfo, callingPackageName)
-        }
+        return allProfiles
+            .mapNotNull { userInfo ->
+                userProfileFactory.createProfile(userInfo, callingPackageName)
+            }
+            .associateBy { it.userId }
     }
 
     /**
