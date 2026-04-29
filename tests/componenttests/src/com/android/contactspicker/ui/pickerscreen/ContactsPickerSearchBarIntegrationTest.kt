@@ -1,20 +1,4 @@
-/*
- * Copyright (C) 2025 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-package com.android.contactspicker.ui.components
+package com.android.contactspicker.ui.pickerscreen
 
 import android.app.ApplicationPackageManager
 import android.app.admin.DevicePolicyManager
@@ -56,10 +40,16 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
+/**
+ * Unlike ContactsPickerSearchBarTest which tests ContactsPickerSearchBar composable in isolation,
+ * this test uses ActivityScenario and invokes the
+ * [com.android.contactspicker.ContactsPickerActivity] to test the search bar behaviour in the
+ * activity's compose hierarchy.
+ */
 @RequiresFlagsEnabled(Flags.FLAG_ENABLE_SYSTEM_CONTACTS_PICKER)
 @UninstallModules(AppModule::class, ActivityModule::class)
 @HiltAndroidTest
-class ContactsPickerSearchBarTest {
+class ContactsPickerSearchBarIntegrationTest {
 
     @get:Rule(order = 0) val hiltRule = HiltAndroidRule(this)
     @get:Rule(order = 1)
@@ -97,7 +87,7 @@ class ContactsPickerSearchBarTest {
                 action = Intent.ACTION_PICK
                 type = ContactsContract.Contacts.CONTENT_TYPE
             }
-        scenario = ActivityScenario.launch<ContactsPickerActivity>(intent)
+        scenario = ActivityScenario.launch(intent)
     }
 
     @After
