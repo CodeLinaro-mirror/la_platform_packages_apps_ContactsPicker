@@ -42,7 +42,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,6 +50,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.android.contactspicker.ContactsUiState
 import com.android.contactspicker.R
@@ -60,7 +61,7 @@ import com.android.contactspicker.data.model.PhoneContact
 import com.android.contactspicker.data.model.SelectionSource
 import com.android.contactspicker.ui.components.EmptyContactsScreen
 
-private val CollapsedSearchBarPaddingValues = PaddingValues(start = 8.dp, end = 8.dp)
+private val CollapsedSearchBarPaddingValues = PaddingValues(start = 8.dp, end = 0.dp)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -74,8 +75,7 @@ fun ContactsPickerSearchBar(
     onToggleEntrySelection: (Long, Long, SelectionSource) -> Unit,
     onExitSearch: () -> Unit,
 ) {
-
-    var query by remember { mutableStateOf("") }
+    var query by rememberSaveable { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
 
     SearchBar(
@@ -97,7 +97,11 @@ fun ContactsPickerSearchBar(
                     val hintRes =
                         if (expanded) R.string.contacts_picker_search_expanded_hint
                         else R.string.contacts_picker_top_bar_search_placeholder_hint
-                    Text(stringResource(hintRes))
+                    Text(
+                        text = stringResource(hintRes),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
                 },
                 leadingIcon = {
                     SearchBarLeadingIcon(
